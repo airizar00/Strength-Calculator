@@ -14,8 +14,18 @@ main{max-width:520px;margin:0 auto;padding:20px 16px 48px}
 h1,h2,.big{font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-weight:700;letter-spacing:.2px}
 h1{font-size:2rem;margin:8px 0 4px}
 h2{font-size:1.4rem;margin:0 0 12px}
-p.sub{margin:0 0 16px;color:var(--mute)}
-.top{display:flex;gap:12px;margin-bottom:16px}
+p.sub{color:var(--mute)}
+.sub{margin:0}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
+header h1{margin-top:0}
+.tools{display:flex;align-items:flex-end;gap:10px}
+.tools label{flex:none}
+.tools select{width:auto;padding:6px 8px;font-size:.95rem}
+#flag{width:46px;height:46px;margin:0;padding:6px;display:flex;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--line);border-radius:8px}
+#flag svg{width:100%;height:auto;display:block;border-radius:2px}
+.grid{display:grid;gap:16px}
+.grid section{margin-bottom:0}
+@media(min-width:820px){main{max-width:1040px;padding:32px 28px 56px}h1{font-size:2.6rem}.grid{grid-template-columns:1fr 1fr;gap:24px;align-items:start}section{padding:24px}}
 section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:16px}
 .row{display:flex;gap:12px}
 label{display:block;flex:1;font-size:.9rem;color:var(--mute)}
@@ -41,14 +51,15 @@ summary{cursor:pointer;color:var(--mute);font-size:.9rem}
 </head>
 <body>
 <main>
-<h1 data-i="title"></h1>
-<p class="sub" data-i="sub"></p>
-
-<div class="top">
-<label><span data-i="lang"></span><select id="lang"><option value="en">English</option><option value="es">Español</option></select></label>
+<header>
+<div><h1 data-i="title"></h1><p class="sub" data-i="sub"></p></div>
+<div class="tools">
 <label><span data-i="units"></span><select id="unit"><option value="kg">kg</option><option value="lb">lb</option></select></label>
+<button id="flag" type="button"></button>
 </div>
+</header>
 
+<div class="grid">
 <section aria-labelledby="t1">
 <h2 id="t1" data-i="t1"></h2>
 <div class="row">
@@ -69,6 +80,7 @@ summary{cursor:pointer;color:var(--mute);font-size:.9rem}
 <button id="b2" data-i="b2"></button>
 <div id="o2" aria-live="polite"></div>
 </section>
+</div>
 </main>
 
 <script>
@@ -95,6 +107,10 @@ const I={
 const PL={
  kg:[{u:25,c:'#c8312b',h:110},{u:20,c:'#1f5fa8',h:110},{u:15,c:'#c9a400',h:96},{u:10,c:'#2e8b4f',h:82},{u:5,c:'#6b7580',h:66},{u:2.5,c:'#3a424a',h:52},{u:1.25,c:'#8a949d',h:42}],
  lb:[{u:45,c:'#1f5fa8',h:110},{u:35,c:'#c9a400',h:96},{u:25,c:'#2e8b4f',h:82},{u:10,c:'#6b7580',h:66},{u:5,c:'#3a424a',h:52},{u:2.5,c:'#8a949d',h:42}]
+};
+const FLAGS={
+ en:'<svg viewBox="0 0 60 40" aria-hidden="true"><rect width="60" height="40" fill="#012169"/><path d="M0 0L60 40M60 0L0 40" stroke="#fff" stroke-width="8"/><path d="M0 0L60 40M60 0L0 40" stroke="#c8102e" stroke-width="3"/><path d="M30 0V40M0 20H60" stroke="#fff" stroke-width="12"/><path d="M30 0V40M0 20H60" stroke="#c8102e" stroke-width="7"/></svg>',
+ es:'<svg viewBox="0 0 60 40" aria-hidden="true"><rect width="60" height="40" fill="#aa151b"/><rect y="10" width="60" height="20" fill="#f1bf00"/></svg>'
 };
 const $=id=>document.getElementById(id);
 let S={};
@@ -156,13 +172,16 @@ function render(){
   document.documentElement.lang=S.lang;
   document.title=T('title');
   document.querySelectorAll('[data-i]').forEach(e=>e.textContent=T(e.dataset.i));
-  $('lang').value=S.lang;$('unit').value=S.unit;
+  $('unit').value=S.unit;
+  $('flag').innerHTML=FLAGS[S.lang];
+  const lab=S.lang==='en'?'Cambiar a español':'Switch to English';
+  $('flag').setAttribute('aria-label',lab);$('flag').title=lab;
   chips();
   if(shown1)calc1RM();
   if(shown2)calcPlates();
 }
 
-$('lang').addEventListener('change',e=>{S.lang=e.target.value;save();render()});
+$('flag').addEventListener('click',()=>{S.lang=S.lang==='en'?'es':'en';save();render()});
 $('unit').addEventListener('change',e=>{S.unit=e.target.value;$('bw').value=S.unit==='kg'?20:45;save();render()});
 $('b1').addEventListener('click',calc1RM);
 $('b2').addEventListener('click',calcPlates);
