@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strength Calculator</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&display=swap">
+<style>
+:root{--bg:#eef0f2;--card:#fff;--ink:#1c2126;--mute:#5d6770;--line:#d5dade;--accent:#1c2126;--onaccent:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#14181c;--card:#1d2328;--ink:#eef0f2;--mute:#97a1ab;--line:#2f373e;--accent:#eef0f2;--onaccent:#14181c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
+main{max-width:520px;margin:0 auto;padding:20px 16px 48px}
+h1,h2,.big{font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-weight:700;letter-spacing:.2px}
+h1{font-size:2rem;margin:8px 0 4px}
+h2{font-size:1.4rem;margin:0 0 12px}
+p.sub{margin:0 0 20px;color:var(--mute)}
+section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:16px}
+.row{display:flex;gap:12px}
+label{display:block;flex:1;font-size:.9rem;color:var(--mute)}
+input{width:100%;margin-top:4px;padding:10px;font:inherit;font-size:1.1rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px}
+input:focus-visible,button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+button{margin-top:14px;width:100%;padding:12px;font:inherit;font-weight:600;color:var(--onaccent);background:var(--accent);border:0;border-radius:6px;cursor:pointer}
+.big{font-size:3rem;line-height:1;margin:16px 0 4px}
+.note{color:var(--mute);font-size:.9rem;margin:0}
+.err{color:#c8312b;margin:12px 0 0}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+td,th{padding:6px 0;text-align:left;border-bottom:1px solid var(--line)}
+td:last-child,th:last-child{text-align:right}
+.bar{display:flex;align-items:center;height:110px;margin:16px 0 8px}
+.shaft{height:10px;width:34px;background:#8a949d;border-radius:2px 0 0 2px}
+.plate{width:16px;margin-right:3px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff}
+.list{margin:0;font-weight:600}
+</style>
+</head>
+<body>
+<main>
+<h1>Strength Calculator</h1>
+<p class="sub">Your estimated max and the plates to load on the bar.</p>
+
+<section aria-labelledby="t1">
+<h2 id="t1">Estimated one-rep max (1RM)</h2>
+<div class="row">
+<label>Weight (kg)<input id="w" type="number" inputmode="decimal" min="0" step="0.5" value="100"></label>
+<label>Reps<input id="r" type="number" inputmode="numeric" min="1" max="30" step="1" value="5"></label>
+</div>
+<button id="b1">Calculate 1RM</button>
+<div id="o1" aria-live="polite"></div>
+</section>
+
+<section aria-labelledby="t2">
+<h2 id="t2">Plate calculator</h2>
+<div class="row">
+<label>Target weight (kg)<input id="t" type="number" inputmode="decimal" min="0" step="0.5" value="102.5"></label>
+<label>Bar (kg)<input id="bw" type="number" inputmode="decimal" min="0" step="0.5" value="20"></label>
+</div>
+<button id="b2">Calculate plates</button>
+<div id="o2" aria-live="polite"></div>
+</section>
+</main>
+
+<script>
+// Olympic plate colours and sizes (kg)
+var PLATES=[{kg:25,c:'#c8312b',h:110},{kg:20,c:'#1f5fa8',h:110},{kg:15,c:'#c9a400',h:96},{kg:10,c:'#2e8b4f',h:82},{kg:5,c:'#6b7580',h:66},{kg:2.5,c:'#3a424a',h:52},{kg:1.25,c:'#8a949d',h:42}];
+var $=function(id){return document.getElementById(id)};
+var fmt=function(n){return (Math.round(n*100)/100).toString()};
+var round05=function(n){return Math.round(n*2)/2};
+
+function calc1RM(){
+  var w=parseFloat($('w').value), r=parseInt($('r').value,10), o=$('o1');
+  if(!(w>0)||!(r>=1)||r>30){o.innerHTML='<p class="err">Enter a weight above 0 and between 1 and 30 reps.</p>';return}
+  var epley=r===1?w:w*(1+r/30);
+  var brzycki=r<37?w*36/(37-r):epley;
+  var rm=(epley+brzycki)/2;
+  var rows='';
+  [100,95,90,85,80,75,70,60].forEach(function(p){rows+='<tr><td>'+p+'%</td><td>'+fmt(round05(rm*p/100))+' kg</td></tr>'});
+  o.innerHTML='<div class="big">'+fmt(round05(rm))+' kg</div>'+
+    '<p class="note">Average of the Epley ('+fmt(round05(epley))+' kg) and Brzycki ('+fmt(round05(brzycki))+' kg) formulas.'+(r>12?' Above 12 reps the estimate is less reliable.':'')+'</p>'+
+    '<table><tr><th>Percentage</th><th>Load</th></tr>'+rows+'</table>';
+}
+
+function calcPlates(){
+  var t=parseFloat($('t').value), bar=parseFloat($('bw').value), o=$('o2');
+  if(!(t>0)||!(bar>=0)||t<bar){o.innerHTML='<p class="err">The target weight must be equal to or greater than the bar weight.</p>';return}
+  var side=(t-bar)/2, left=side, used=[];
+  PLATES.forEach(function(p){var n=Math.floor((left+1e-9)/p.kg);if(n>0){used.push({p:p,n:n});left=Math.round((left-n*p.kg)*1000)/1000}});
+  var viz='<div class="bar" aria-hidden="true"><div class="shaft"></div>';
+  var text=[];
+  used.forEach(function(u){
+    for(var i=0;i<u.n;i++){viz+='<div class="plate" style="height:'+u.p.h+'px;background:'+u.p.c+'">'+fmt(u.p.kg)+'</div>'}
+    text.push(u.n+' × '+fmt(u.p.kg)+' kg');
+  });
+  viz+='</div>';
+  var total=t-2*left;
+  o.innerHTML=(used.length?viz+'<p class="list">Per side: '+text.join(' + ')+'</p>':'<p class="list">Just the bar, no plates.</p>')+
+    '<p class="note">Total loaded: '+fmt(total)+' kg.'+(left>0.001?' The target can\'t be reached exactly with these plates; '+fmt(left*2)+' kg short.':'')+'</p>';
+}
+
+$('b1').addEventListener('click',calc1RM);
+$('b2').addEventListener('click',calcPlates);
+</script>
+</body>
+</html>
