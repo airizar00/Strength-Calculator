@@ -32,7 +32,6 @@ label{display:block;flex:1;font-size:.9rem;color:var(--mute)}
 input[type=number],select{width:100%;margin-top:4px;padding:10px;font:inherit;font-size:1.1rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px}
 input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 button{margin-top:14px;width:100%;padding:12px;font:inherit;font-weight:600;color:var(--onaccent);background:var(--accent);border:0;border-radius:6px;cursor:pointer}
-button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);margin-top:10px;padding:8px}
 .big{font-size:3rem;line-height:1;margin:16px 0 4px}
 .note{color:var(--mute);font-size:.9rem;margin:0}
 .err{color:#c8312b;margin:12px 0 0}
@@ -111,12 +110,12 @@ const I={
  en:{title:'Strength Calculator',sub:'Your estimated max and the plates to load on the bar.',lang:'Language',units:'Units',
   t1:'Estimated one-rep max (1RM)',wt:()=>`Weight (${S.unit})`,reps:'Reps',b1:'Calculate 1RM',
   t2:'Plate calculator',tgt:()=>`Target weight (${S.unit})`,bar:()=>`Bar (${S.unit})`,avail:'Plates available at my gym',b2:'Calculate plates',
-  tw:'Warm-up',ww:()=>`Working weight (${S.unit})`,bww:'Calculate warm-up',work:'Working set',persd:'Per side',barOnly:'Bar only',
-  wnote:'Rough guide: adjust it to how you feel. Weights are rounded to what you can load.',e4:'The working weight must be above the bar weight.',
+  tw:'Warm-up',ww:()=>`Target weight (${S.unit})`,bww:'Calculate warm-up',work:'Target set',persd:'Per side',barOnly:'Bar only',
+  wnote:'Rough guide: adjust it to how you feel. Weights are rounded to what you can load.',e4:'The target weight must be above the bar weight.',
   ts:'Sets by percentage',rm3:()=>`Your 1RM (${S.unit})`,preset:'Scheme',ns:'Sets',np:'Percent (%)',bs:'Calculate sets',
   e5:'Enter a 1RM above 0, at least 1 set and 1 rep, and a percentage between 1 and 100.',
+  e6:(p,m)=>`At ${p}% of your 1RM you can usually do about ${m} rep${m===1?'':'s'} per set. Lower the reps or the percentage.`,
   sch:(n,r,p)=>`${n} sets × ${r} reps at ${p}% of your 1RM`,rnd:x=>`Exact value ${x} ${S.unit}, rounded to what you can load.`,
-  copy:'Copy result',copied:'Copied!',
   e1:'Enter a weight above 0 and between 1 and 30 reps.',e2:'The target weight must be equal to or greater than the bar weight.',e3:'Select at least one plate.',
   avg:(a,b)=>`Average of the Epley (${a} ${S.unit}) and Brzycki (${b} ${S.unit}) formulas.`,low:' Above 12 reps the estimate is less reliable.',
   pct:'Percentage',load:'Load',side:'Per side: ',none:'Just the bar, no plates.',total:'Total loaded: ',
@@ -124,12 +123,12 @@ const I={
  es:{title:'Calculadora de fuerza',sub:'Tu máximo estimado y los discos que cargar en la barra.',lang:'Idioma',units:'Unidades',
   t1:'Máximo estimado (1RM)',wt:()=>`Peso (${S.unit})`,reps:'Repeticiones',b1:'Calcular 1RM',
   t2:'Discos para la barra',tgt:()=>`Peso objetivo (${S.unit})`,bar:()=>`Barra (${S.unit})`,avail:'Discos disponibles en mi gimnasio',b2:'Calcular discos',
-  tw:'Calentamiento',ww:()=>`Peso de trabajo (${S.unit})`,bww:'Calcular calentamiento',work:'Serie de trabajo',persd:'Por lado',barOnly:'Solo barra',
-  wnote:'Guía orientativa: ajústala a cómo te sientas. Los pesos se redondean a lo que puedes cargar.',e4:'El peso de trabajo debe ser mayor que el de la barra.',
+  tw:'Calentamiento',ww:()=>`Peso objetivo (${S.unit})`,bww:'Calcular calentamiento',work:'Serie objetivo',persd:'Por lado',barOnly:'Solo barra',
+  wnote:'Guía orientativa: ajústala a cómo te sientas. Los pesos se redondean a lo que puedes cargar.',e4:'El peso objetivo debe ser mayor que el de la barra.',
   ts:'Series por porcentajes',rm3:()=>`Tu 1RM (${S.unit})`,preset:'Esquema',ns:'Series',np:'Porcentaje (%)',bs:'Calcular series',
   e5:'Introduce un 1RM mayor que 0, al menos 1 serie y 1 repetición, y un porcentaje entre 1 y 100.',
+  e6:(p,m)=>`Al ${p}% de tu 1RM normalmente se hacen unas ${m} repeticion${m===1?'':'es'} por serie. Baja las repeticiones o el porcentaje.`,
   sch:(n,r,p)=>`${n} series × ${r} repeticiones al ${p}% de tu 1RM`,rnd:x=>`Valor exacto ${x} ${S.unit}, redondeado a lo que puedes cargar.`,
-  copy:'Copiar resultado',copied:'¡Copiado!',
   e1:'Introduce un peso mayor que 0 y entre 1 y 30 repeticiones.',e2:'El peso objetivo debe ser igual o mayor que el de la barra.',e3:'Selecciona al menos un disco.',
   avg:(a,b)=>`Media de las fórmulas de Epley (${a} ${S.unit}) y Brzycki (${b} ${S.unit}).`,low:' Con más de 12 repeticiones la estimación es menos fiable.',
   pct:'Porcentaje',load:'Carga',side:'Por cada lado: ',none:'Solo la barra, sin discos.',total:'Peso total cargado: ',
@@ -154,7 +153,6 @@ const save=()=>{try{localStorage.setItem('sc',JSON.stringify(S))}catch(e){}};
 const T=k=>{const v=I[S.lang][k];return typeof v==='function'?v():v};
 const fmt=n=>{const s=String(Math.round(n*100)/100);return S.lang==='es'?s.replace('.',','):s};
 const r05=n=>Math.round(n*2)/2;
-const copies={};
 let shown1=false,shown2=false,shown3=false,shown4=false;
 
 function calc1RM(){
@@ -164,10 +162,8 @@ function calc1RM(){
   const ep=r===1?w:w*(1+r/30),br=r<37?w*36/(37-r):ep,rm=(ep+br)/2;
   let rows='';
   [100,95,90,85,80,75,70,60].forEach(p=>rows+=`<tr><td>${p}%</td><td>${fmt(r05(rm*p/100))} ${S.unit}</td></tr>`);
-  copies[1]=`1RM: ${fmt(r05(rm))} ${S.unit} (${fmt(w)} ${S.unit} × ${r})`;
   o.innerHTML=`<div class="big">${fmt(r05(rm))} ${S.unit}</div><p class="note">${I[S.lang].avg(fmt(r05(ep)),fmt(r05(br)))}${r>12?T('low'):''}</p>
-  <table><tr><th>${T('pct')}</th><th>${T('load')}</th></tr>${rows}</table>
-  <button class="ghost" onclick="cp(1,this)">${T('copy')}</button>`;
+  <table><tr><th>${T('pct')}</th><th>${T('load')}</th></tr>${rows}</table>`;
 }
 
 function calcPlates(){
@@ -182,10 +178,8 @@ function calcPlates(){
   used.forEach(u=>{for(let i=0;i<u.n;i++)viz+=`<div class="plate" style="height:${u.p.h}px;background:${u.p.c}">${fmt(u.p.u)}</div>`;txt.push(`${u.n} × ${fmt(u.p.u)} ${S.unit}`)});
   viz+='</div>';
   const total=t-2*left;
-  copies[2]=`${fmt(t)} ${S.unit}: ${used.length?T('side')+txt.join(' + '):T('none')}`;
   o.innerHTML=(used.length?viz+`<p class="list">${T('side')}${txt.join(' + ')}</p>`:`<p class="list">${T('none')}</p>`)+
-   `<p class="note">${T('total')}${fmt(total)} ${S.unit}.${left>0.001?I[S.lang].short(fmt(left*2)):''}</p>
-   <button class="ghost" onclick="cp(2,this)">${T('copy')}</button>`;
+   `<p class="note">${T('total')}${fmt(total)} ${S.unit}.${left>0.001?I[S.lang].short(fmt(left*2)):''}</p>`;
 }
 
 const enabled=()=>PL[S.unit].filter(p=>!S.off[S.unit].includes(p.u));
@@ -213,10 +207,9 @@ function calcWarm(){
     if(x.total>prev&&x.total<w){rows.push({t:x.total,r:'× '+r,u:x.used});prev=x.total}
   });
   const f=snap(w,bar);rows.push({t:f.total,r:T('work'),u:f.used});
-  copies[3]=rows.map(x=>`${fmt(x.t)} ${S.unit} ${x.r} (${sideTxt(x.u)})`).join('\n');
   o.innerHTML=`<table><tr><th>${T('load')}</th><th>${T('reps')}</th><th>${T('persd')}</th></tr>`+
    rows.map(x=>`<tr><td>${fmt(x.t)} ${S.unit}</td><td>${x.r}</td><td>${sideTxt(x.u)}</td></tr>`).join('')+
-   `</table><p class="note" style="margin-top:10px">${T('wnote')}</p><button class="ghost" onclick="cp(3,this)">${T('copy')}</button>`;
+   `</table><p class="note" style="margin-top:10px">${T('wnote')}</p>`;
 }
 
 function calcSets(){
@@ -224,15 +217,11 @@ function calcSets(){
   const rm=parseFloat($('rm3').value),n=parseInt($('ns').value,10),r=parseInt($('nr').value,10),p=parseFloat($('np').value),bar=parseFloat($('bw').value),o=$('o4');
   if(!(rm>0)||!(n>=1)||!(r>=1)||!(p>0)||p>100){o.innerHTML=`<p class="err">${T('e5')}</p>`;return}
   if(!enabled().length){o.innerHTML=`<p class="err">${T('e3')}</p>`;return}
+  const mx=Math.max(1,Math.floor(37-36*p/100+1e-9));
+  if(r>mx){o.innerHTML=`<p class="err">${I[S.lang].e6(fmt(p),mx)}</p>`;return}
   const raw=rm*p/100,x=raw<=bar?{total:bar,used:[]}:snap(raw,bar),side=sideTxt(x.used);
-  copies[4]=`${I[S.lang].sch(n,r,fmt(p))}: ${fmt(x.total)} ${S.unit} (${side})`;
   o.innerHTML=`<div class="big">${fmt(x.total)} ${S.unit}</div><p class="list">${I[S.lang].sch(n,r,fmt(p))}</p>
-   <p class="note">${T('side')}${side}</p>${Math.abs(x.total-raw)>0.01?`<p class="note">${I[S.lang].rnd(fmt(Math.round(raw*100)/100))}</p>`:''}
-   <button class="ghost" onclick="cp(4,this)">${T('copy')}</button>`;
-}
-
-async function cp(n,btn){
-  try{await navigator.clipboard.writeText(copies[n]);btn.textContent=T('copied');setTimeout(()=>btn.textContent=T('copy'),1500)}catch(e){}
+   <p class="note">${T('side')}${side}</p>${Math.abs(x.total-raw)>0.01?`<p class="note">${I[S.lang].rnd(fmt(Math.round(raw*100)/100))}</p>`:''}`;
 }
 
 function chips(){
