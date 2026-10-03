@@ -29,7 +29,7 @@ header h1{margin-top:0}
 section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:16px}
 .row{display:flex;gap:12px}
 label{display:block;flex:1;font-size:.9rem;color:var(--mute)}
-input[type=number],select{width:100%;margin-top:4px;padding:10px;font:inherit;font-size:1.1rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px}
+input[type=number],input[type=text],input[type=date],select{width:100%;margin-top:4px;padding:10px;font:inherit;font-size:1.1rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px}
 input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 button{margin-top:14px;width:100%;padding:12px;font:inherit;font-weight:600;color:var(--onaccent);background:var(--accent);border:0;border-radius:6px;cursor:pointer}
 .big{font-size:3rem;line-height:1;margin:16px 0 4px}
@@ -43,6 +43,19 @@ td:last-child,th:last-child{text-align:right}
 .plate{width:16px;margin-right:3px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff}
 .list{margin:0;font-weight:600}
 details{margin-top:14px}
+.wide{grid-column:1/-1}
+.srow{display:grid;grid-template-columns:28px 1fr 1fr 40px;gap:8px;align-items:center;margin-top:8px}
+.srow input{margin-top:0}
+.srow .mini{width:100%;padding:8px 0}
+.hdr{font-size:.9rem;color:var(--mute);margin-top:14px}
+.sn{color:var(--mute);font-weight:600}
+button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.mini{width:auto;margin:0;padding:2px 8px}
+#hchart svg{width:100%;height:auto;margin-top:10px}
+#hchart text{fill:var(--mute);font-size:11px}
+#hchart .ln{fill:none;stroke:var(--ink);stroke-width:2}
+#hchart .gr{stroke:var(--line)}
+#hchart circle{fill:var(--ink)}
 summary{cursor:pointer;color:var(--mute);font-size:.9rem}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .chips label{flex:none;display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;color:var(--ink)}
@@ -101,6 +114,31 @@ summary{cursor:pointer;color:var(--mute);font-size:.9rem}
 <button id="b4" data-i="bs"></button>
 <div id="o4" aria-live="polite"></div>
 </section>
+
+<section class="wide" aria-labelledby="t5">
+<h2 id="t5" data-i="th"></h2>
+<div class="row">
+<label><span data-i="hex"></span><select id="hx"></select></label>
+<label><span data-i="hdate"></span><input id="hd" type="date"></label>
+</div>
+<div class="srow hdr" aria-hidden="true"><span></span><span data-i="wt"></span><span data-i="reps"></span><span></span></div>
+<div id="hsets"></div>
+<button id="hmore" class="sec" type="button" data-i="hadds"></button>
+<button id="hadd" data-i="hadd"></button>
+<p class="note" id="hmsg" aria-live="polite" style="margin-top:10px"></p>
+<p class="list" id="hbest" style="margin-top:14px"></p>
+<div id="hchart"></div>
+<div id="hl"></div>
+<details><summary data-i="hmanage"></summary>
+<label style="margin-top:10px"><span data-i="hnew"></span><input id="hn" type="text" maxlength="40"></label>
+<button id="hax" class="sec" data-i="haddex"></button>
+<button id="hdx" class="sec" data-i="hdelex"></button>
+<button id="hexp" class="sec" data-i="hexp"></button>
+<button id="himp" class="sec" data-i="himp"></button>
+<input id="hf" type="file" accept="application/json,.json" hidden>
+</details>
+<p class="note" style="margin-top:14px" data-i="hnote"></p>
+</section>
 </div>
 </main>
 
@@ -115,6 +153,10 @@ const I={
   ts:'Sets by percentage',rm3:()=>`Your 1RM (${S.unit})`,preset:'Scheme',ns:'Sets',np:'Percent (%)',bs:'Calculate sets',
   e5:'Enter a 1RM above 0, at least 1 set and 1 rep, and a percentage between 1 and 100.',
   e6:(p,m)=>`At ${p}% of your 1RM you can usually do about ${m} rep${m===1?'':'s'} per set. Lower the reps or the percentage.`,
+  th:'History',hex:'Exercise',hdate:'Date',hadd:'Save session',hmanage:'Manage exercises and backup',hnew:'New exercise',haddex:'Add exercise',hdelex:'Delete selected exercise',hexp:'Export backup',himp:'Import backup',
+  hnote:'Saved only in this browser on this device. Export a backup to keep it safe or to move it to another device.',hbest:'Best estimated 1RM:',hchart:'Estimated 1RM over time',hnone:'No entries yet for this exercise.',hnoex:'Add an exercise to start.',
+  he1:'Enter a date and at least one set with a weight above 0 and between 1 and 30 reps.',hdup:'That exercise already exists.',hconf:n=>`Delete "${n}" and all its entries?`,himpok:n=>`Imported ${n} new sessions.`,himperr:'That file is not a valid backup.',hdel:'Delete entry',hsaved:'Session saved.',hwr:'Sets',he1rm:'Est. 1RM',
+  defEx:['Squat','Bench press','Deadlift'],hadds:'+ Add set',hrm:'Remove set',hsetn:'Set',hvol:'Volume',hdelc:n=>`Tap again to delete "${n}" and its sessions`,hdeleted:n=>`"${n}" deleted.`,
   sch:(n,r,p)=>`${n} sets × ${r} reps at ${p}% of your 1RM`,rnd:x=>`Exact value ${x} ${S.unit}, rounded to what you can load.`,
   e1:'Enter a weight above 0 and between 1 and 30 reps.',e2:'The target weight must be equal to or greater than the bar weight.',e3:'Select at least one plate.',
   avg:(a,b)=>`Average of the Epley (${a} ${S.unit}) and Brzycki (${b} ${S.unit}) formulas.`,low:' Above 12 reps the estimate is less reliable.',
@@ -128,6 +170,10 @@ const I={
   ts:'Series por porcentajes',rm3:()=>`Tu 1RM (${S.unit})`,preset:'Esquema',ns:'Series',np:'Porcentaje (%)',bs:'Calcular series',
   e5:'Introduce un 1RM mayor que 0, al menos 1 serie y 1 repetición, y un porcentaje entre 1 y 100.',
   e6:(p,m)=>`Al ${p}% de tu 1RM normalmente se hacen unas ${m} repeticion${m===1?'':'es'} por serie. Baja las repeticiones o el porcentaje.`,
+  th:'Historial',hex:'Ejercicio',hdate:'Fecha',hadd:'Guardar sesión',hmanage:'Gestionar ejercicios y copia de seguridad',hnew:'Nuevo ejercicio',haddex:'Añadir ejercicio',hdelex:'Eliminar el ejercicio seleccionado',hexp:'Exportar copia',himp:'Importar copia',
+  hnote:'Se guarda solo en este navegador y en este dispositivo. Exporta una copia para conservarla o para llevarla a otro dispositivo.',hbest:'Mejor 1RM estimado:',hchart:'1RM estimado a lo largo del tiempo',hnone:'Aún no hay registros de este ejercicio.',hnoex:'Añade un ejercicio para empezar.',
+  he1:'Introduce una fecha y al menos una serie con un peso mayor que 0 y entre 1 y 30 repeticiones.',hdup:'Ese ejercicio ya existe.',hconf:n=>`¿Eliminar "${n}" y todos sus registros?`,himpok:n=>`Se han importado ${n} sesiones nuevas.`,himperr:'Ese archivo no es una copia de seguridad válida.',hdel:'Eliminar registro',hsaved:'Sesión guardada.',hwr:'Series',he1rm:'1RM est.',
+  defEx:['Sentadilla','Press banca','Peso muerto'],hadds:'+ Añadir serie',hrm:'Quitar serie',hsetn:'Serie',hvol:'Volumen',hdelc:n=>`Pulsa otra vez para eliminar "${n}" y sus sesiones`,hdeleted:n=>`"${n}" eliminado.`,
   sch:(n,r,p)=>`${n} series × ${r} repeticiones al ${p}% de tu 1RM`,rnd:x=>`Valor exacto ${x} ${S.unit}, redondeado a lo que puedes cargar.`,
   e1:'Introduce un peso mayor que 0 y entre 1 y 30 repeticiones.',e2:'El peso objetivo debe ser igual o mayor que el de la barra.',e3:'Selecciona al menos un disco.',
   avg:(a,b)=>`Media de las fórmulas de Epley (${a} ${S.unit}) y Brzycki (${b} ${S.unit}).`,low:' Con más de 12 repeticiones la estimación es menos fiable.',
@@ -224,6 +270,115 @@ function calcSets(){
    <p class="note">${T('side')}${side}</p>${Math.abs(x.total-raw)>0.01?`<p class="note">${I[S.lang].rnd(fmt(Math.round(raw*100)/100))}</p>`:''}`;
 }
 
+// ---------- History (saved in this browser only) ----------
+const HK='sc_hist',KGLB=2.20462;
+let H={ex:[],log:[],init:false};
+try{const d=JSON.parse(localStorage.getItem(HK)||'null');if(d&&Array.isArray(d.ex)&&Array.isArray(d.log))H=d}catch(e){}
+if(!H.init){if(!H.ex.length)H.ex=T('defEx').slice();H.init=true}
+const saveH=()=>{try{localStorage.setItem(HK,JSON.stringify(H))}catch(e){}};
+const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const conv=(v,u)=>u===S.unit?v:(u==='kg'?v*KGLB:v/KGLB);
+const setsOf=x=>Array.isArray(x.sets)?x.sets:[{w:x.w,r:x.r}];
+const e1=(w,r)=>{const ep=r===1?w:w*(1+r/30),br=r<37?w*36/(37-r):ep;return (ep+br)/2};
+
+function chart(pts){
+  const W=600,Ht=190,L=46,R=12,Tp=12,B=26,ts=pts.map(p=>p.t),t0=Math.min(...ts),t1=Math.max(...ts),vs=pts.map(p=>p.v);
+  let lo=Math.min(...vs),hi=Math.max(...vs);const mn=lo,mx=hi;
+  if(hi-lo<1){lo-=1;hi+=1}
+  const pad=(hi-lo)*.1;lo-=pad;hi+=pad;
+  const X=t=>t1===t0?(L+W-R)/2:L+(t-t0)/(t1-t0)*(W-L-R),Y=v=>Tp+(hi-v)/(hi-lo)*(Ht-Tp-B);
+  const line=pts.map(p=>`${X(p.t).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ');
+  const dots=pts.map(p=>`<circle cx="${X(p.t).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="3.5"/>`).join('');
+  const first=pts[0].d,last=pts[pts.length-1].d;
+  return `<svg viewBox="0 0 ${W} ${Ht}" role="img" aria-label="${T('hchart')}">
+   <line class="gr" x1="${L}" x2="${W-R}" y1="${Y(mx)}" y2="${Y(mx)}"/><line class="gr" x1="${L}" x2="${W-R}" y1="${Y(mn)}" y2="${Y(mn)}"/>
+   <text x="${L-6}" y="${Y(mx)+4}" text-anchor="end">${fmt(r05(mx))}</text><text x="${L-6}" y="${Y(mn)+4}" text-anchor="end">${fmt(r05(mn))}</text>
+   <polyline class="ln" points="${line}"/>${dots}
+   <text x="${t1===t0?(L+W-R)/2:L}" y="${Ht-6}" text-anchor="${t1===t0?'middle':'start'}">${esc(first)}</text>${t1===t0?'':`<text x="${W-R}" y="${Ht-6}" text-anchor="end">${esc(last)}</text>`}</svg>`;
+}
+
+function renderHist(){
+  const sel=$('hx');
+  sel.innerHTML=H.ex.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  if(!H.ex.includes(H.cur))H.cur=H.ex[0];
+  if(H.cur!==undefined)sel.value=H.cur;
+  if(!H.ex.length){$('hbest').textContent='';$('hchart').innerHTML='';$('hl').innerHTML=`<p class="note">${T('hnoex')}</p>`;return}
+  const pts=H.log.filter(x=>x.ex===H.cur).map(x=>{const ss=setsOf(x);return {id:x.id,d:x.date,t:Date.parse(x.date),u:x.u,ss,v:Math.max(...ss.map(q=>conv(e1(q.w,q.r),x.u))),vol:conv(ss.reduce((t,q)=>t+q.w*q.r,0),x.u)}}).sort((x,y)=>x.t-y.t);
+  if(!pts.length){$('hbest').textContent='';$('hchart').innerHTML='';$('hl').innerHTML=`<p class="note">${T('hnone')}</p>`;return}
+  const best=Math.max(...pts.map(p=>p.v));
+  $('hbest').textContent=`${T('hbest')} ${fmt(r05(best))} ${S.unit}`;
+  $('hchart').innerHTML=chart(pts);
+  $('hl').innerHTML=`<table><tr><th>${T('hdate')}</th><th>${T('hwr')}</th><th>${T('he1rm')}</th><th></th></tr>`+
+   pts.slice().reverse().slice(0,12).map(p=>`<tr><td>${esc(p.d)}</td><td>${p.ss.map(q=>`${fmt(q.w)}×${q.r}`).join(', ')} ${p.u}<br><span class="note">${T('hvol')}: ${fmt(Math.round(p.vol))} ${S.unit}</span></td><td>${fmt(r05(p.v))}${p.v===best?' ★':''}</td><td><button class="sec mini" data-del="${esc(p.id)}" aria-label="${T('hdel')}">✕</button></td></tr>`).join('')+'</table>';
+}
+
+function labelRows(){
+  document.querySelectorAll('#hsets .srow').forEach((row,i)=>{
+    row.querySelector('.sn').textContent=i+1;
+    row.querySelector('.sw').setAttribute('aria-label',`${T('hsetn')} ${i+1}: ${T('wt')}`);
+    row.querySelector('.sr').setAttribute('aria-label',`${T('hsetn')} ${i+1}: ${T('reps')}`);
+    row.querySelector('.rm').setAttribute('aria-label',T('hrm'));
+  });
+}
+function addSetRow(w,r){
+  if($('hsets').children.length>=20)return;
+  const d=document.createElement('div');d.className='srow';
+  d.innerHTML=`<span class="sn"></span><input class="sw" type="number" inputmode="decimal" min="0" step="0.5" value="${w}"><input class="sr" type="number" inputmode="numeric" min="1" max="30" step="1" value="${r}"><button type="button" class="sec mini rm">✕</button>`;
+  $('hsets').appendChild(d);labelRows();
+}
+function addEntry(){
+  const d=$('hd').value,sets=[];let bad=false;
+  $('hsets').querySelectorAll('.srow').forEach(row=>{
+    const ws=row.querySelector('.sw').value.trim(),rs=row.querySelector('.sr').value.trim();
+    if(!ws&&!rs)return;
+    const w=parseFloat(ws),r=parseInt(rs,10);
+    if(!(w>0)||!(r>=1&&r<=30))bad=true;else sets.push({w,r});
+  });
+  if(!H.cur||!d||bad||!sets.length){$('hmsg').textContent=T('he1');return}
+  H.log.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),ex:H.cur,date:d,u:S.unit,sets});
+  saveH();$('hmsg').textContent=T('hsaved');
+  $('hsets').innerHTML='';addSetRow('','');
+  renderHist();
+}
+function addEx(){
+  const n=$('hn').value.trim().slice(0,40);if(!n)return;
+  if(H.ex.includes(n)){$('hmsg').textContent=T('hdup');return}
+  H.ex.push(n);H.cur=n;$('hn').value='';$('hmsg').textContent='';saveH();renderHist();
+}
+let delArm=null,delT=0;
+function delEx(){
+  if(!H.cur)return;
+  const b=$('hdx');
+  if(delArm===H.cur){
+    clearTimeout(delT);delArm=null;
+    const n=H.cur;
+    H.ex=H.ex.filter(x=>x!==n);H.log=H.log.filter(x=>x.ex!==n);H.cur=H.ex[0];
+    saveH();b.textContent=T('hdelex');$('hmsg').textContent=I[S.lang].hdeleted(n);renderHist();return;
+  }
+  delArm=H.cur;b.textContent=I[S.lang].hdelc(H.cur);
+  clearTimeout(delT);delT=setTimeout(()=>{delArm=null;b.textContent=T('hdelex')},5000);
+}
+function exportH(){
+  const b=new Blob([JSON.stringify({app:'strength-calculator',version:1,ex:H.ex,log:H.log},null,1)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='strength-history.json';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function importH(txt){
+  try{
+    const d=JSON.parse(txt);
+    if(!d||!Array.isArray(d.ex)||!Array.isArray(d.log))throw new Error('bad');
+    d.ex.forEach(n=>{n=String(n).trim().slice(0,40);if(n&&!H.ex.includes(n))H.ex.push(n)});
+    const ids=new Set(H.log.map(x=>x.id));let c=0;
+    d.log.forEach(x=>{
+      const sets=(Array.isArray(x.sets)?x.sets:[{w:x.w,r:x.r}]).map(q=>({w:+q.w,r:parseInt(q.r,10)})).filter(q=>q.w>0&&q.r>=1&&q.r<=30),ex=String(x.ex||'').trim().slice(0,40),id=String(x.id||'');
+      if(!id||ids.has(id)||!ex||!/^\d{4}-\d{2}-\d{2}$/.test(String(x.date))||!sets.length||!['kg','lb'].includes(x.u))return;
+      if(!H.ex.includes(ex))H.ex.push(ex);
+      H.log.push({id,ex,date:x.date,u:x.u,sets});ids.add(id);c++;
+    });
+    saveH();renderHist();$('hmsg').textContent=I[S.lang].himpok(c);
+  }catch(e){$('hmsg').textContent=T('himperr')}
+}
+
 function chips(){
   $('chips').innerHTML=PL[S.unit].map(p=>`<label><input type="checkbox" data-u="${p.u}" ${S.off[S.unit].includes(p.u)?'':'checked'}> ${fmt(p.u)} ${S.unit}</label>`).join('');
   $('chips').querySelectorAll('input').forEach(c=>c.addEventListener('change',()=>{
@@ -233,6 +388,7 @@ function chips(){
 }
 
 function render(){
+  delArm=null;
   document.documentElement.lang=S.lang;
   document.title=T('title');
   document.querySelectorAll('[data-i]').forEach(e=>e.textContent=T(e.dataset.i));
@@ -245,6 +401,8 @@ function render(){
   if(shown2)calcPlates();
   if(shown3)calcWarm();
   if(shown4)calcSets();
+  labelRows();
+  renderHist();
 }
 
 $('flag').addEventListener('click',()=>{S.lang=S.lang==='en'?'es':'en';save();render()});
@@ -254,6 +412,18 @@ $('b2').addEventListener('click',calcPlates);
 $('b3').addEventListener('click',calcWarm);
 $('b4').addEventListener('click',calcSets);
 $('pre').addEventListener('change',e=>{const m=e.target.value.match(/(\d+)x(\d+)@(\d+)/);$('ns').value=m[1];$('nr').value=m[2];$('np').value=m[3]});
+$('hx').addEventListener('change',e=>{delArm=null;$('hdx').textContent=T('hdelex');H.cur=e.target.value;saveH();$('hmsg').textContent='';renderHist()});
+$('hadd').addEventListener('click',addEntry);
+$('hmore').addEventListener('click',()=>{const l=$('hsets').lastElementChild;addSetRow(l?l.querySelector('.sw').value:'',l?l.querySelector('.sr').value:'')});
+$('hsets').addEventListener('click',e=>{const b=e.target.closest('.rm');if(!b)return;const row=b.parentNode;if($('hsets').children.length>1){row.remove();labelRows()}else{row.querySelector('.sw').value='';row.querySelector('.sr').value=''}});
+$('hax').addEventListener('click',addEx);
+$('hdx').addEventListener('click',delEx);
+$('hexp').addEventListener('click',exportH);
+$('himp').addEventListener('click',()=>$('hf').click());
+$('hf').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>importH(String(rd.result));rd.readAsText(f);e.target.value=''});
+$('hl').addEventListener('click',e=>{const b=e.target.closest('button[data-del]');if(!b)return;H.log=H.log.filter(x=>x.id!==b.dataset.del);saveH();renderHist()});
+$('hd').value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+addSetRow('','');
 if(S.unit==='lb')$('bw').value=45;
 render();
 </script>
