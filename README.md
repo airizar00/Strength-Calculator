@@ -7,7 +7,7 @@ A small, single-page web tool for lifters:
 
 - **Warm-up**: a rough warm-up ramp towards your working weight, rounded to the plates you can load.
 - **Sets by percentage**: choose a scheme (e.g. 5 × 5 @ 80%) and get the exact load and plates.
-- **History**: log sessions per exercise (several sets, each with its own weight and reps; custom exercises), see your estimated 1RM over time and your best mark. Data stays in your browser; export/import a JSON backup.
+- **History**: log sessions per exercise (several sets, each with its own weight and reps; custom exercises), see your estimated 1RM over time and your records (best estimated 1RM, heaviest weight lifted, most volume in a session and in a set). Data stays in your browser; export/import a JSON backup.
 - English / Spanish, kg / lb, and configurable available plates.
 
 Runs entirely in the browser, with no dependencies. Open `index.html` to use it.

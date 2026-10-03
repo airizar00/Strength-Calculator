@@ -44,6 +44,11 @@ td:last-child,th:last-child{text-align:right}
 .list{margin:0;font-weight:600}
 details{margin-top:14px}
 .wide{grid-column:1/-1}
+.prs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.pr{border:1px solid var(--line);border-radius:8px;padding:10px}
+.pr b{display:block;font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-size:1.5rem;line-height:1.15}
+.pr span{display:block;color:var(--mute);font-size:.85rem}
+@media(min-width:820px){.prs{grid-template-columns:repeat(4,1fr)}}
 .srow{display:grid;grid-template-columns:28px 1fr 1fr 40px;gap:8px;align-items:center;margin-top:8px}
 .srow input{margin-top:0}
 .srow .mini{width:100%;padding:8px 0}
@@ -126,7 +131,7 @@ summary{cursor:pointer;color:var(--mute);font-size:.9rem}
 <button id="hmore" class="sec" type="button" data-i="hadds"></button>
 <button id="hadd" data-i="hadd"></button>
 <p class="note" id="hmsg" aria-live="polite" style="margin-top:10px"></p>
-<p class="list" id="hbest" style="margin-top:14px"></p>
+<div class="prs" id="hbest"></div>
 <div id="hchart"></div>
 <div id="hl"></div>
 <details><summary data-i="hmanage"></summary>
@@ -156,7 +161,7 @@ const I={
   th:'History',hex:'Exercise',hdate:'Date',hadd:'Save session',hmanage:'Manage exercises and backup',hnew:'New exercise',haddex:'Add exercise',hdelex:'Delete selected exercise',hexp:'Export backup',himp:'Import backup',
   hnote:'Saved only in this browser on this device. Export a backup to keep it safe or to move it to another device.',hbest:'Best estimated 1RM:',hchart:'Estimated 1RM over time',hnone:'No entries yet for this exercise.',hnoex:'Add an exercise to start.',
   he1:'Enter a date and at least one set with a weight above 0 and between 1 and 30 reps.',hdup:'That exercise already exists.',hconf:n=>`Delete "${n}" and all its entries?`,himpok:n=>`Imported ${n} new sessions.`,himperr:'That file is not a valid backup.',hdel:'Delete entry',hsaved:'Session saved.',hwr:'Sets',he1rm:'Est. 1RM',
-  defEx:['Squat','Bench press','Deadlift'],hadds:'+ Add set',hrm:'Remove set',hsetn:'Set',hvol:'Volume',hdelc:n=>`Tap again to delete "${n}" and its sessions`,hdeleted:n=>`"${n}" deleted.`,
+  defEx:['Squat','Bench press','Deadlift'],hadds:'+ Add set',hrm:'Remove set',hsetn:'Set',hvol:'Volume',hpr1:'Best estimated 1RM',hpr2:'Heaviest weight lifted (PR)',hpr3:'Most volume in a session',hpr4:'Most volume in a set',hdelc:n=>`Tap again to delete "${n}" and its sessions`,hdeleted:n=>`"${n}" deleted.`,
   sch:(n,r,p)=>`${n} sets × ${r} reps at ${p}% of your 1RM`,rnd:x=>`Exact value ${x} ${S.unit}, rounded to what you can load.`,
   e1:'Enter a weight above 0 and between 1 and 30 reps.',e2:'The target weight must be equal to or greater than the bar weight.',e3:'Select at least one plate.',
   avg:(a,b)=>`Average of the Epley (${a} ${S.unit}) and Brzycki (${b} ${S.unit}) formulas.`,low:' Above 12 reps the estimate is less reliable.',
@@ -173,7 +178,7 @@ const I={
   th:'Historial',hex:'Ejercicio',hdate:'Fecha',hadd:'Guardar sesión',hmanage:'Gestionar ejercicios y copia de seguridad',hnew:'Nuevo ejercicio',haddex:'Añadir ejercicio',hdelex:'Eliminar el ejercicio seleccionado',hexp:'Exportar copia',himp:'Importar copia',
   hnote:'Se guarda solo en este navegador y en este dispositivo. Exporta una copia para conservarla o para llevarla a otro dispositivo.',hbest:'Mejor 1RM estimado:',hchart:'1RM estimado a lo largo del tiempo',hnone:'Aún no hay registros de este ejercicio.',hnoex:'Añade un ejercicio para empezar.',
   he1:'Introduce una fecha y al menos una serie con un peso mayor que 0 y entre 1 y 30 repeticiones.',hdup:'Ese ejercicio ya existe.',hconf:n=>`¿Eliminar "${n}" y todos sus registros?`,himpok:n=>`Se han importado ${n} sesiones nuevas.`,himperr:'Ese archivo no es una copia de seguridad válida.',hdel:'Eliminar registro',hsaved:'Sesión guardada.',hwr:'Series',he1rm:'1RM est.',
-  defEx:['Sentadilla','Press banca','Peso muerto'],hadds:'+ Añadir serie',hrm:'Quitar serie',hsetn:'Serie',hvol:'Volumen',hdelc:n=>`Pulsa otra vez para eliminar "${n}" y sus sesiones`,hdeleted:n=>`"${n}" eliminado.`,
+  defEx:['Sentadilla','Press banca','Peso muerto'],hadds:'+ Añadir serie',hrm:'Quitar serie',hsetn:'Serie',hvol:'Volumen',hpr1:'Mejor 1RM estimado',hpr2:'Mayor peso levantado (RP)',hpr3:'Mayor volumen en una sesión',hpr4:'Mayor volumen en una serie',hdelc:n=>`Pulsa otra vez para eliminar "${n}" y sus sesiones`,hdeleted:n=>`"${n}" eliminado.`,
   sch:(n,r,p)=>`${n} series × ${r} repeticiones al ${p}% de tu 1RM`,rnd:x=>`Valor exacto ${x} ${S.unit}, redondeado a lo que puedes cargar.`,
   e1:'Introduce un peso mayor que 0 y entre 1 y 30 repeticiones.',e2:'El peso objetivo debe ser igual o mayor que el de la barra.',e3:'Selecciona al menos un disco.',
   avg:(a,b)=>`Media de las fórmulas de Epley (${a} ${S.unit}) y Brzycki (${b} ${S.unit}).`,low:' Con más de 12 repeticiones la estimación es menos fiable.',
@@ -306,7 +311,22 @@ function renderHist(){
   const pts=H.log.filter(x=>x.ex===H.cur).map(x=>{const ss=setsOf(x);return {id:x.id,d:x.date,t:Date.parse(x.date),u:x.u,ss,v:Math.max(...ss.map(q=>conv(e1(q.w,q.r),x.u))),vol:conv(ss.reduce((t,q)=>t+q.w*q.r,0),x.u)}}).sort((x,y)=>x.t-y.t);
   if(!pts.length){$('hbest').textContent='';$('hchart').innerHTML='';$('hl').innerHTML=`<p class="note">${T('hnone')}</p>`;return}
   const best=Math.max(...pts.map(p=>p.v));
-  $('hbest').textContent=`${T('hbest')} ${fmt(r05(best))} ${S.unit}`;
+  const bestP=pts.find(p=>p.v===best);
+  let hw=null,hv=null,hs=null;
+  pts.forEach(p=>{
+    p.ss.forEach(q=>{
+      const w=conv(q.w,p.u),v=w*q.r,same=p.u===S.unit;
+      if(!hw||w>hw.w+1e-9)hw={w,same,d:p.d};
+      if(!hs||v>hs.v+1e-9)hs={v,w,same,r:q.r,d:p.d};
+    });
+    if(!hv||p.vol>hv.v+1e-9)hv={v:p.vol,d:p.d};
+  });
+  const dw=(x,same)=>same?fmt(x):fmt(Math.round(x*10)/10);
+  const card=(l,v,d)=>`<div class="pr"><span>${l}</span><b>${v}</b><span>${d}</span></div>`;
+  $('hbest').innerHTML=card(T('hpr1'),`${fmt(r05(best))} ${S.unit}`,esc(bestP.d))+
+   card(T('hpr2'),`${dw(hw.w,hw.same)} ${S.unit}`,esc(hw.d))+
+   card(T('hpr3'),`${fmt(Math.round(hv.v))} ${S.unit}`,esc(hv.d))+
+   card(T('hpr4'),`${fmt(Math.round(hs.v))} ${S.unit}`,`${dw(hs.w,hs.same)} × ${hs.r} · ${esc(hs.d)}`);
   $('hchart').innerHTML=chart(pts);
   $('hl').innerHTML=`<table><tr><th>${T('hdate')}</th><th>${T('hwr')}</th><th>${T('he1rm')}</th><th></th></tr>`+
    pts.slice().reverse().slice(0,12).map(p=>`<tr><td>${esc(p.d)}</td><td>${p.ss.map(q=>`${fmt(q.w)}×${q.r}`).join(', ')} ${p.u}<br><span class="note">${T('hvol')}: ${fmt(Math.round(p.vol))} ${S.unit}</span></td><td>${fmt(r05(p.v))}${p.v===best?' ★':''}</td><td><button class="sec mini" data-del="${esc(p.id)}" aria-label="${T('hdel')}">✕</button></td></tr>`).join('')+'</table>';
