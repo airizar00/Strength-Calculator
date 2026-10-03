@@ -80,6 +80,28 @@ summary{cursor:pointer;color:var(--mute);font-size:.9rem}
 <button id="b2" data-i="b2"></button>
 <div id="o2" aria-live="polite"></div>
 </section>
+
+<section aria-labelledby="t3">
+<h2 id="t3" data-i="tw"></h2>
+<label><span data-i="ww"></span><input id="ww" type="number" inputmode="decimal" min="0" step="0.5" value="100"></label>
+<button id="b3" data-i="bww"></button>
+<div id="o3" aria-live="polite"></div>
+</section>
+
+<section aria-labelledby="t4">
+<h2 id="t4" data-i="ts"></h2>
+<div class="row">
+<label><span data-i="rm3"></span><input id="rm3" type="number" inputmode="decimal" min="0" step="0.5" value="100"></label>
+<label><span data-i="preset"></span><select id="pre"><option value="5x5@80">5 × 5 @ 80%</option><option value="3x8@70">3 × 8 @ 70%</option><option value="4x6@75">4 × 6 @ 75%</option><option value="5x3@85">5 × 3 @ 85%</option><option value="3x10@65">3 × 10 @ 65%</option></select></label>
+</div>
+<div class="row" style="margin-top:12px">
+<label><span data-i="ns"></span><input id="ns" type="number" inputmode="numeric" min="1" step="1" value="5"></label>
+<label><span data-i="reps"></span><input id="nr" type="number" inputmode="numeric" min="1" step="1" value="5"></label>
+<label><span data-i="np"></span><input id="np" type="number" inputmode="decimal" min="1" max="100" step="0.5" value="80"></label>
+</div>
+<button id="b4" data-i="bs"></button>
+<div id="o4" aria-live="polite"></div>
+</section>
 </div>
 </main>
 
@@ -89,6 +111,11 @@ const I={
  en:{title:'Strength Calculator',sub:'Your estimated max and the plates to load on the bar.',lang:'Language',units:'Units',
   t1:'Estimated one-rep max (1RM)',wt:()=>`Weight (${S.unit})`,reps:'Reps',b1:'Calculate 1RM',
   t2:'Plate calculator',tgt:()=>`Target weight (${S.unit})`,bar:()=>`Bar (${S.unit})`,avail:'Plates available at my gym',b2:'Calculate plates',
+  tw:'Warm-up',ww:()=>`Working weight (${S.unit})`,bww:'Calculate warm-up',work:'Working set',persd:'Per side',barOnly:'Bar only',
+  wnote:'Rough guide: adjust it to how you feel. Weights are rounded to what you can load.',e4:'The working weight must be above the bar weight.',
+  ts:'Sets by percentage',rm3:()=>`Your 1RM (${S.unit})`,preset:'Scheme',ns:'Sets',np:'Percent (%)',bs:'Calculate sets',
+  e5:'Enter a 1RM above 0, at least 1 set and 1 rep, and a percentage between 1 and 100.',
+  sch:(n,r,p)=>`${n} sets × ${r} reps at ${p}% of your 1RM`,rnd:x=>`Exact value ${x} ${S.unit}, rounded to what you can load.`,
   copy:'Copy result',copied:'Copied!',
   e1:'Enter a weight above 0 and between 1 and 30 reps.',e2:'The target weight must be equal to or greater than the bar weight.',e3:'Select at least one plate.',
   avg:(a,b)=>`Average of the Epley (${a} ${S.unit}) and Brzycki (${b} ${S.unit}) formulas.`,low:' Above 12 reps the estimate is less reliable.',
@@ -97,6 +124,11 @@ const I={
  es:{title:'Calculadora de fuerza',sub:'Tu máximo estimado y los discos que cargar en la barra.',lang:'Idioma',units:'Unidades',
   t1:'Máximo estimado (1RM)',wt:()=>`Peso (${S.unit})`,reps:'Repeticiones',b1:'Calcular 1RM',
   t2:'Discos para la barra',tgt:()=>`Peso objetivo (${S.unit})`,bar:()=>`Barra (${S.unit})`,avail:'Discos disponibles en mi gimnasio',b2:'Calcular discos',
+  tw:'Calentamiento',ww:()=>`Peso de trabajo (${S.unit})`,bww:'Calcular calentamiento',work:'Serie de trabajo',persd:'Por lado',barOnly:'Solo barra',
+  wnote:'Guía orientativa: ajústala a cómo te sientas. Los pesos se redondean a lo que puedes cargar.',e4:'El peso de trabajo debe ser mayor que el de la barra.',
+  ts:'Series por porcentajes',rm3:()=>`Tu 1RM (${S.unit})`,preset:'Esquema',ns:'Series',np:'Porcentaje (%)',bs:'Calcular series',
+  e5:'Introduce un 1RM mayor que 0, al menos 1 serie y 1 repetición, y un porcentaje entre 1 y 100.',
+  sch:(n,r,p)=>`${n} series × ${r} repeticiones al ${p}% de tu 1RM`,rnd:x=>`Valor exacto ${x} ${S.unit}, redondeado a lo que puedes cargar.`,
   copy:'Copiar resultado',copied:'¡Copiado!',
   e1:'Introduce un peso mayor que 0 y entre 1 y 30 repeticiones.',e2:'El peso objetivo debe ser igual o mayor que el de la barra.',e3:'Selecciona al menos un disco.',
   avg:(a,b)=>`Media de las fórmulas de Epley (${a} ${S.unit}) y Brzycki (${b} ${S.unit}).`,low:' Con más de 12 repeticiones la estimación es menos fiable.',
@@ -123,7 +155,7 @@ const T=k=>{const v=I[S.lang][k];return typeof v==='function'?v():v};
 const fmt=n=>{const s=String(Math.round(n*100)/100);return S.lang==='es'?s.replace('.',','):s};
 const r05=n=>Math.round(n*2)/2;
 const copies={};
-let shown1=false,shown2=false;
+let shown1=false,shown2=false,shown3=false,shown4=false;
 
 function calc1RM(){
   shown1=true;
@@ -156,6 +188,49 @@ function calcPlates(){
    <button class="ghost" onclick="cp(2,this)">${T('copy')}</button>`;
 }
 
+const enabled=()=>PL[S.unit].filter(p=>!S.off[S.unit].includes(p.u));
+function load(side){
+  let left=side;const used=[];
+  enabled().forEach(p=>{const n=Math.floor((left+1e-9)/p.u);if(n>0){used.push({p,n});left=Math.round((left-n*p.u)*1000)/1000}});
+  return {used,left};
+}
+// Nearest weight you can actually load with the enabled plates
+function snap(x,bar){
+  const set=enabled(),side=Math.max(0,(x-bar)/2),a=load(side),lo=side-a.left,hi=lo+set[set.length-1].u;
+  const side2=(side-lo<=hi-side)?lo:hi,b=load(side2);
+  return {total:bar+2*(side2-b.left),used:b.used};
+}
+const sideTxt=u=>u.length?u.map(x=>`${x.n}×${fmt(x.p.u)}`).join(' + '):T('barOnly');
+
+function calcWarm(){
+  shown3=true;
+  const w=parseFloat($('ww').value),bar=parseFloat($('bw').value),o=$('o3');
+  if(!(w>0)||!(bar>=0)||w<=bar){o.innerHTML=`<p class="err">${T('e4')}</p>`;return}
+  if(!enabled().length){o.innerHTML=`<p class="err">${T('e3')}</p>`;return}
+  const rows=[];let prev=-1;
+  [[0,10],[.4,5],[.6,3],[.8,2],[.9,1]].forEach(([p,r])=>{
+    const x=p===0?{total:bar,used:[]}:snap(w*p,bar);
+    if(x.total>prev&&x.total<w){rows.push({t:x.total,r:'× '+r,u:x.used});prev=x.total}
+  });
+  const f=snap(w,bar);rows.push({t:f.total,r:T('work'),u:f.used});
+  copies[3]=rows.map(x=>`${fmt(x.t)} ${S.unit} ${x.r} (${sideTxt(x.u)})`).join('\n');
+  o.innerHTML=`<table><tr><th>${T('load')}</th><th>${T('reps')}</th><th>${T('persd')}</th></tr>`+
+   rows.map(x=>`<tr><td>${fmt(x.t)} ${S.unit}</td><td>${x.r}</td><td>${sideTxt(x.u)}</td></tr>`).join('')+
+   `</table><p class="note" style="margin-top:10px">${T('wnote')}</p><button class="ghost" onclick="cp(3,this)">${T('copy')}</button>`;
+}
+
+function calcSets(){
+  shown4=true;
+  const rm=parseFloat($('rm3').value),n=parseInt($('ns').value,10),r=parseInt($('nr').value,10),p=parseFloat($('np').value),bar=parseFloat($('bw').value),o=$('o4');
+  if(!(rm>0)||!(n>=1)||!(r>=1)||!(p>0)||p>100){o.innerHTML=`<p class="err">${T('e5')}</p>`;return}
+  if(!enabled().length){o.innerHTML=`<p class="err">${T('e3')}</p>`;return}
+  const raw=rm*p/100,x=raw<=bar?{total:bar,used:[]}:snap(raw,bar),side=sideTxt(x.used);
+  copies[4]=`${I[S.lang].sch(n,r,fmt(p))}: ${fmt(x.total)} ${S.unit} (${side})`;
+  o.innerHTML=`<div class="big">${fmt(x.total)} ${S.unit}</div><p class="list">${I[S.lang].sch(n,r,fmt(p))}</p>
+   <p class="note">${T('side')}${side}</p>${Math.abs(x.total-raw)>0.01?`<p class="note">${I[S.lang].rnd(fmt(Math.round(raw*100)/100))}</p>`:''}
+   <button class="ghost" onclick="cp(4,this)">${T('copy')}</button>`;
+}
+
 async function cp(n,btn){
   try{await navigator.clipboard.writeText(copies[n]);btn.textContent=T('copied');setTimeout(()=>btn.textContent=T('copy'),1500)}catch(e){}
 }
@@ -179,12 +254,17 @@ function render(){
   chips();
   if(shown1)calc1RM();
   if(shown2)calcPlates();
+  if(shown3)calcWarm();
+  if(shown4)calcSets();
 }
 
 $('flag').addEventListener('click',()=>{S.lang=S.lang==='en'?'es':'en';save();render()});
 $('unit').addEventListener('change',e=>{S.unit=e.target.value;$('bw').value=S.unit==='kg'?20:45;save();render()});
 $('b1').addEventListener('click',calc1RM);
 $('b2').addEventListener('click',calcPlates);
+$('b3').addEventListener('click',calcWarm);
+$('b4').addEventListener('click',calcSets);
+$('pre').addEventListener('change',e=>{const m=e.target.value.match(/(\d+)x(\d+)@(\d+)/);$('ns').value=m[1];$('nr').value=m[2];$('np').value=m[3]});
 if(S.unit==='lb')$('bw').value=45;
 render();
 </script>
