@@ -171,7 +171,7 @@ const I={
   th:'History',hex:'Exercise',hdate:'Date',hadd:'Save session',hmanage:'Manage exercises and backup',hnew:'New exercise',haddex:'Add exercise',hdelex:'Delete selected exercise',hexp:'Export backup',himp:'Import backup',
   hnote:'Saved only in this browser on this device. Export a backup to keep it safe or to move it to another device.',hbest:'Best estimated 1RM:',hchart:'Estimated 1RM over time',hnone:'No entries yet for this exercise.',hnoex:'Add an exercise to start.',
   he1:'Enter a date and at least one set with a weight above 0 and between 1 and 30 reps.',hdup:'That exercise already exists.',hconf:n=>`Delete "${n}" and all its entries?`,himpok:n=>`Imported ${n} new sessions.`,himperr:'That file is not a valid backup.',hdel:'Delete entry',hsaved:'Session saved.',hwr:'Sets',he1rm:'Est. 1RM',
-  defEx:['Squat','Bench press','Deadlift'],hadds:'+ Add set',hrm:'Remove set',hsetn:'Set',hvol:'Volume',hpr1:'Best estimated 1RM',hpr2:'Heaviest weight lifted (PR)',hpr3:'Most volume in a session',hpr4:'Most volume in a set',
+  dn:{squat:'Squat',bench:'Bench press',dead:'Deadlift'},hadds:'+ Add set',hrm:'Remove set',hsetn:'Set',hvol:'Volume',hpr1:'Best estimated 1RM',hpr2:'Heaviest weight lifted (PR)',hpr3:'Most volume in a session',hpr4:'Most volume in a set',
   r14:'2 weeks',r30:'1 month',r90:'3 months',r365:'1 year',r0:'All',hnorange:'No sessions in this period.',
   hprog:'Progression suggestion',hgoal:'Goal',hgw:()=>`Goal weight (${S.unit})`,hs0:'Log a session to get suggestions.',
   hsbase:(e,w)=>`Reference: estimated 1RM ${e} ${S.unit} (${w}).`,hwk:'last 4 weeks',hlast:'latest session',
@@ -199,7 +199,7 @@ const I={
   th:'Historial',hex:'Ejercicio',hdate:'Fecha',hadd:'Guardar sesión',hmanage:'Gestionar ejercicios y copia de seguridad',hnew:'Nuevo ejercicio',haddex:'Añadir ejercicio',hdelex:'Eliminar el ejercicio seleccionado',hexp:'Exportar copia',himp:'Importar copia',
   hnote:'Se guarda solo en este navegador y en este dispositivo. Exporta una copia para conservarla o para llevarla a otro dispositivo.',hbest:'Mejor 1RM estimado:',hchart:'1RM estimado a lo largo del tiempo',hnone:'Aún no hay registros de este ejercicio.',hnoex:'Añade un ejercicio para empezar.',
   he1:'Introduce una fecha y al menos una serie con un peso mayor que 0 y entre 1 y 30 repeticiones.',hdup:'Ese ejercicio ya existe.',hconf:n=>`¿Eliminar "${n}" y todos sus registros?`,himpok:n=>`Se han importado ${n} sesiones nuevas.`,himperr:'Ese archivo no es una copia de seguridad válida.',hdel:'Eliminar registro',hsaved:'Sesión guardada.',hwr:'Series',he1rm:'1RM est.',
-  defEx:['Sentadilla','Press banca','Peso muerto'],hadds:'+ Añadir serie',hrm:'Quitar serie',hsetn:'Serie',hvol:'Volumen',hpr1:'Mejor 1RM estimado',hpr2:'Mayor peso levantado (RP)',hpr3:'Mayor volumen en una sesión',hpr4:'Mayor volumen en una serie',
+  dn:{squat:'Sentadilla',bench:'Press banca',dead:'Peso muerto'},hadds:'+ Añadir serie',hrm:'Quitar serie',hsetn:'Serie',hvol:'Volumen',hpr1:'Mejor 1RM estimado',hpr2:'Mayor peso levantado (RP)',hpr3:'Mayor volumen en una sesión',hpr4:'Mayor volumen en una serie',
   r14:'2 semanas',r30:'1 mes',r90:'3 meses',r365:'1 año',r0:'Todo',hnorange:'No hay sesiones en este periodo.',
   hprog:'Sugerencia de progresión',hgoal:'Objetivo',hgw:()=>`Peso objetivo (${S.unit})`,hs0:'Registra una sesión para recibir sugerencias.',
   hsbase:(e,w)=>`Referencia: 1RM estimado de ${e} ${S.unit} (${w}).`,hwk:'últimas 4 semanas',hlast:'última sesión',
@@ -308,11 +308,17 @@ function calcSets(){
 }
 
 // ---------- History (saved in this browser only) ----------
+// Default exercises are stored as ids (def:squat...) and translated on display; custom ones keep their own name
+const exId=n=>{n=String(n).trim();const l=n.toLowerCase();for(const k in I.en.dn){if(I.en.dn[k].toLowerCase()===l||I.es.dn[k].toLowerCase()===l)return 'def:'+k}return n};
+const exName=id=>(String(id).startsWith('def:')&&I[S.lang].dn[id.slice(4)])||id;
 const HK='sc_hist',KGLB=2.20462;
 let H={ex:[],log:[],init:false};
 try{const d=JSON.parse(localStorage.getItem(HK)||'null');if(d&&Array.isArray(d.ex)&&Array.isArray(d.log))H=d}catch(e){}
 H.goals=H.goals||{};
-if(!H.init){if(!H.ex.length)H.ex=T('defEx').slice();H.init=true}
+if(!H.init){if(!H.ex.length)H.ex=['def:squat','def:bench','def:dead'];H.init=true}
+H.ex=[...new Set(H.ex.map(exId))];H.log.forEach(x=>{x.ex=exId(x.ex)});
+{const g={};Object.keys(H.goals||{}).forEach(k=>{g[exId(k)]=H.goals[k]});H.goals=g}
+if(H.cur)H.cur=exId(H.cur);
 const saveH=()=>{try{localStorage.setItem(HK,JSON.stringify(H))}catch(e){}};
 const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const conv=(v,u)=>u===S.unit?v:(u==='kg'?v*KGLB:v/KGLB);
@@ -366,7 +372,7 @@ function renderCoach(pts){
 
 function renderHist(){
   const sel=$('hx');
-  sel.innerHTML=H.ex.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  sel.innerHTML=H.ex.map(n=>`<option value="${esc(n)}">${esc(exName(n))}</option>`).join('');
   if(!H.ex.includes(H.cur))H.cur=H.ex[0];
   if(H.cur!==undefined)sel.value=H.cur;
   if(!H.ex.length){$('hbest').textContent='';$('hchart').innerHTML='';$('hl').innerHTML=`<p class="note">${T('hnoex')}</p>`;$('hsug').innerHTML='';$('hgo').innerHTML='';return}
@@ -426,7 +432,7 @@ function addEntry(){
   renderHist();
 }
 function addEx(){
-  const n=$('hn').value.trim().slice(0,40);if(!n)return;
+  const n=exId($('hn').value.trim().slice(0,40));if(!n)return;
   if(H.ex.includes(n)){$('hmsg').textContent=T('hdup');return}
   H.ex.push(n);H.cur=n;$('hn').value='';$('hmsg').textContent='';saveH();renderHist();
 }
@@ -438,9 +444,9 @@ function delEx(){
     clearTimeout(delT);delArm=null;
     const n=H.cur;
     H.ex=H.ex.filter(x=>x!==n);H.log=H.log.filter(x=>x.ex!==n);delete H.goals[n];H.cur=H.ex[0];
-    saveH();b.textContent=T('hdelex');$('hmsg').textContent=I[S.lang].hdeleted(n);renderHist();return;
+    saveH();b.textContent=T('hdelex');$('hmsg').textContent=I[S.lang].hdeleted(exName(n));renderHist();return;
   }
-  delArm=H.cur;b.textContent=I[S.lang].hdelc(H.cur);
+  delArm=H.cur;b.textContent=I[S.lang].hdelc(exName(H.cur));
   clearTimeout(delT);delT=setTimeout(()=>{delArm=null;b.textContent=T('hdelex')},5000);
 }
 function exportH(){
@@ -452,15 +458,15 @@ function importH(txt){
   try{
     const d=JSON.parse(txt);
     if(!d||!Array.isArray(d.ex)||!Array.isArray(d.log))throw new Error('bad');
-    d.ex.forEach(n=>{n=String(n).trim().slice(0,40);if(n&&!H.ex.includes(n))H.ex.push(n)});
+    d.ex.forEach(n=>{n=exId(String(n).trim().slice(0,40));if(n&&!H.ex.includes(n))H.ex.push(n)});
     const ids=new Set(H.log.map(x=>x.id));let c=0;
     d.log.forEach(x=>{
-      const sets=(Array.isArray(x.sets)?x.sets:[{w:x.w,r:x.r}]).map(q=>({w:+q.w,r:parseInt(q.r,10)})).filter(q=>q.w>0&&q.r>=1&&q.r<=30),ex=String(x.ex||'').trim().slice(0,40),id=String(x.id||'');
+      const sets=(Array.isArray(x.sets)?x.sets:[{w:x.w,r:x.r}]).map(q=>({w:+q.w,r:parseInt(q.r,10)})).filter(q=>q.w>0&&q.r>=1&&q.r<=30),ex=exId(String(x.ex||'').trim().slice(0,40)),id=String(x.id||'');
       if(!id||ids.has(id)||!ex||!/^\d{4}-\d{2}-\d{2}$/.test(String(x.date))||!sets.length||!['kg','lb'].includes(x.u))return;
       if(!H.ex.includes(ex))H.ex.push(ex);
       H.log.push({id,ex,date:x.date,u:x.u,sets});ids.add(id);c++;
     });
-    if(d.goals&&typeof d.goals==='object')Object.keys(d.goals).forEach(k=>{const q=d.goals[k],ex=String(k).trim().slice(0,40);if(ex&&!H.goals[ex]&&q&&+q.w>0&&['kg','lb'].includes(q.u)){H.goals[ex]={w:+q.w,u:q.u};if(!H.ex.includes(ex))H.ex.push(ex)}});
+    if(d.goals&&typeof d.goals==='object')Object.keys(d.goals).forEach(k=>{const q=d.goals[k],ex=exId(String(k).trim().slice(0,40));if(ex&&!H.goals[ex]&&q&&+q.w>0&&['kg','lb'].includes(q.u)){H.goals[ex]={w:+q.w,u:q.u};if(!H.ex.includes(ex))H.ex.push(ex)}});
     saveH();renderHist();$('hmsg').textContent=I[S.lang].himpok(c);
   }catch(e){$('hmsg').textContent=T('himperr')}
 }
