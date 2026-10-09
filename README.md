@@ -4,18 +4,17 @@ A small web tool for lifters: estimate your max, load the bar, warm up, plan set
 
 **Try it:** https://airizar00.github.io/Strength-Calculator/
 
-<table>
-  <tr>
-    <th align="center" width="33%">Calculators</th>
-    <th align="center" width="33%">History and records</th>
-    <th align="center" width="33%">On your phone</th>
-  </tr>
-  <tr>
-    <td><img src="screenshot-1.png" alt="Calculators"></td>
-    <td><img src="screenshot-2.png" alt="History and records"></td>
-    <td><img src="screenshot-3.png" alt="On your phone"></td>
-  </tr>
-</table>
+<p align="center">
+  <img src="screenshot-1.png" alt="Calculators: 1RM estimator and plate calculator" width="860">
+</p>
+
+<p align="center">
+  <img src="screenshot-2.png" alt="History, records and progress chart" width="400">
+  &nbsp;&nbsp;&nbsp;
+  <img src="screenshot-3.png" alt="The app on a phone" width="242">
+</p>
+
+<p align="center"><sub>Calculators &nbsp;·&nbsp; History and records &nbsp;·&nbsp; On your phone</sub></p>
 
 ## Features
 
