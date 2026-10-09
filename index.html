@@ -160,6 +160,7 @@ summary{cursor:pointer;color:var(--mute);font-size:.9rem}
 <button id="hcancel" class="sec" type="button" hidden data-i="hcancel"></button>
 <p class="note" id="hmsg" aria-live="polite" style="margin-top:10px"></p>
 <div class="prs" id="hbest"></div>
+<div id="hrepw" hidden><div class="sub2" data-i="hrept"></div><div class="prs" id="hrep"></div><p class="note" style="margin-top:8px" data-i="hrepn"></p></div>
 <div class="seg" id="hrange"><button type="button" class="sec" data-r="14" data-i="r14"></button><button type="button" class="sec" data-r="30" data-i="r30"></button><button type="button" class="sec" data-r="90" data-i="r90"></button><button type="button" class="sec" data-r="365" data-i="r365"></button><button type="button" class="sec" data-r="0" data-i="r0"></button></div>
 <div id="hchart"></div>
 <div class="sub2" data-i="hprog"></div>
@@ -195,7 +196,7 @@ const I={
   th:'History',hex:'Exercise',hdate:'Date',hadd:'Save session',hmanage:'Manage exercises and backup',hnew:'New exercise',haddex:'Add exercise',hdelex:'Delete selected exercise',hexp:'Export backup',himp:'Import backup',
   hnote:'Saved only in this browser on this device. Export a backup to keep it safe or to move it to another device.',hbest:'Best estimated 1RM:',hchart:'Estimated 1RM over time',hnone:'No entries yet for this exercise.',hnoex:'Add an exercise to start.',
   he1:'Enter a date and at least one set with a weight above 0 and between 1 and 30 reps.',hdup:'That exercise already exists.',hconf:n=>`Delete "${n}" and all its entries?`,himpok:n=>`Imported ${n} new sessions.`,himperr:'That file is not a valid backup.',hdel:'Delete entry',hsaved:'Session saved.',hupd:'Update session',hcancel:'Cancel edit',hupdated:'Session updated.',hedt:'Edit session',hedit:d=>`Editing the session from ${d}. Change what you need and update it.`,hconv:u=>`It was recorded in ${u}; values are shown converted to ${S.unit}.`,hgone:'That session no longer exists.',hwr:'Sets',he1rm:'Est. 1RM',
-  dn:{squat:'Squat',bench:'Bench press',dead:'Deadlift'},hadds:'+ Add set',hrm:'Remove set',hsetn:'Set',hvol:'Volume',trt:'Rest timer',rtstart:'Start',rtpause:'Pause',rtresume:'Resume',rtreset:'Reset',rtcustom:'Custom time (seconds)',rtsound:'Sound',rtvib:'Vibration',rtdone:'Rest over. Next set!',rtnote:'Where your browser allows it, the screen stays on while counting down. If your phone locks the screen, the alert may not sound or vibrate.',hpr1:'Best estimated 1RM',hpr2:'Heaviest weight lifted (PR)',hpr3:'Most volume in a session',hpr4:'Most volume in a set',
+  dn:{squat:'Squat',bench:'Bench press',dead:'Deadlift'},hadds:'+ Add set',hrm:'Remove set',hsetn:'Set',hvol:'Volume',hrept:'Rep records',hrepn:'Heaviest weight lifted for at least that many reps in a single set.',hreps:n=>`${n} rep${n===1?'':'s'}`,trt:'Rest timer',rtstart:'Start',rtpause:'Pause',rtresume:'Resume',rtreset:'Reset',rtcustom:'Custom time (seconds)',rtsound:'Sound',rtvib:'Vibration',rtdone:'Rest over. Next set!',rtnote:'Where your browser allows it, the screen stays on while counting down. If your phone locks the screen, the alert may not sound or vibrate.',hpr1:'Best estimated 1RM',hpr2:'Heaviest weight lifted (PR)',hpr3:'Most volume in a session',hpr4:'Most volume in a set',
   r14:'2 weeks',r30:'1 month',r90:'3 months',r365:'1 year',r0:'All',hnorange:'No sessions in this period.',
   hprog:'Progression suggestion',hgoal:'Goal',hgw:()=>`Goal weight (${S.unit})`,hs0:'Log a session to get suggestions.',
   hsbase:(e,w)=>`Reference: estimated 1RM ${e} ${S.unit} (${w}).`,hwk:'last 4 weeks',hlast:'latest session',
@@ -223,7 +224,7 @@ const I={
   th:'Historial',hex:'Ejercicio',hdate:'Fecha',hadd:'Guardar sesión',hmanage:'Gestionar ejercicios y copia de seguridad',hnew:'Nuevo ejercicio',haddex:'Añadir ejercicio',hdelex:'Eliminar el ejercicio seleccionado',hexp:'Exportar copia',himp:'Importar copia',
   hnote:'Se guarda solo en este navegador y en este dispositivo. Exporta una copia para conservarla o para llevarla a otro dispositivo.',hbest:'Mejor 1RM estimado:',hchart:'1RM estimado a lo largo del tiempo',hnone:'Aún no hay registros de este ejercicio.',hnoex:'Añade un ejercicio para empezar.',
   he1:'Introduce una fecha y al menos una serie con un peso mayor que 0 y entre 1 y 30 repeticiones.',hdup:'Ese ejercicio ya existe.',hconf:n=>`¿Eliminar "${n}" y todos sus registros?`,himpok:n=>`Se han importado ${n} sesiones nuevas.`,himperr:'Ese archivo no es una copia de seguridad válida.',hdel:'Eliminar registro',hsaved:'Sesión guardada.',hupd:'Actualizar sesión',hcancel:'Cancelar edición',hupdated:'Sesión actualizada.',hedt:'Editar sesión',hedit:d=>`Editando la sesión del ${d}. Cambia lo que necesites y actualízala.`,hconv:u=>`Se registró en ${u}; los valores se muestran convertidos a ${S.unit}.`,hgone:'Esa sesión ya no existe.',hwr:'Series',he1rm:'1RM est.',
-  dn:{squat:'Sentadilla',bench:'Press banca',dead:'Peso muerto'},hadds:'+ Añadir serie',hrm:'Quitar serie',hsetn:'Serie',hvol:'Volumen',trt:'Temporizador de descanso',rtstart:'Iniciar',rtpause:'Pausar',rtresume:'Reanudar',rtreset:'Reiniciar',rtcustom:'Tiempo personalizado (segundos)',rtsound:'Sonido',rtvib:'Vibración',rtdone:'Descanso terminado. ¡Siguiente serie!',rtnote:'Si tu navegador lo permite, la pantalla se mantiene encendida durante la cuenta atrás. Si el móvil bloquea la pantalla, puede que el aviso no suene ni vibre.',hpr1:'Mejor 1RM estimado',hpr2:'Mayor peso levantado (RP)',hpr3:'Mayor volumen en una sesión',hpr4:'Mayor volumen en una serie',
+  dn:{squat:'Sentadilla',bench:'Press banca',dead:'Peso muerto'},hadds:'+ Añadir serie',hrm:'Quitar serie',hsetn:'Serie',hvol:'Volumen',hrept:'Récords por repeticiones',hrepn:'Mayor peso levantado con al menos ese número de repeticiones en una sola serie.',hreps:n=>n===1?'1 repetición':`${n} repeticiones`,trt:'Temporizador de descanso',rtstart:'Iniciar',rtpause:'Pausar',rtresume:'Reanudar',rtreset:'Reiniciar',rtcustom:'Tiempo personalizado (segundos)',rtsound:'Sonido',rtvib:'Vibración',rtdone:'Descanso terminado. ¡Siguiente serie!',rtnote:'Si tu navegador lo permite, la pantalla se mantiene encendida durante la cuenta atrás. Si el móvil bloquea la pantalla, puede que el aviso no suene ni vibre.',hpr1:'Mejor 1RM estimado',hpr2:'Mayor peso levantado (RP)',hpr3:'Mayor volumen en una sesión',hpr4:'Mayor volumen en una serie',
   r14:'2 semanas',r30:'1 mes',r90:'3 meses',r365:'1 año',r0:'Todo',hnorange:'No hay sesiones en este periodo.',
   hprog:'Sugerencia de progresión',hgoal:'Objetivo',hgw:()=>`Peso objetivo (${S.unit})`,hs0:'Registra una sesión para recibir sugerencias.',
   hsbase:(e,w)=>`Referencia: 1RM estimado de ${e} ${S.unit} (${w}).`,hwk:'últimas 4 semanas',hlast:'última sesión',
@@ -396,6 +397,7 @@ function renderCoach(pts){
 
 function renderHist(){
   const sel=$('hx');
+  $('hrepw').hidden=true;
   sel.innerHTML=H.ex.map(n=>`<option value="${esc(n)}">${esc(exName(n))}</option>`).join('');
   if(!H.ex.includes(H.cur))H.cur=H.ex[0];
   if(H.cur!==undefined)sel.value=H.cur;
@@ -419,6 +421,13 @@ function renderHist(){
    card(T('hpr2'),`${dw(hw.w,hw.same)} ${S.unit}`,esc(hw.d))+
    card(T('hpr3'),`${fmt(Math.round(hv.v))} ${S.unit}`,esc(hv.d))+
    card(T('hpr4'),`${fmt(Math.round(hs.v))} ${S.unit}`,`${dw(hs.w,hs.same)} × ${hs.r} · ${esc(hs.d)}`);
+  const RN=[1,3,5,10];
+  $('hrep').innerHTML=RN.map(n=>{
+    let b=null;
+    pts.forEach(p=>p.ss.forEach(q=>{if(q.r>=n){const w=conv(q.w,p.u);if(!b||w>b.w+1e-9)b={w,same:p.u===S.unit,d:p.d}}}));
+    return card(I[S.lang].hreps(n),b?`${dw(b.w,b.same)} ${S.unit}`:'—',b?esc(b.d):'');
+  }).join('');
+  $('hrepw').hidden=false;
   document.querySelectorAll('#hrange button').forEach(b=>b.classList.toggle('on',+b.dataset.r===(H.range|0)));
   const shown=pts.filter(p=>!H.range||p.t>=Date.now()-H.range*864e5);
   $('hchart').innerHTML=shown.length?chart(shown):`<p class="note" style="margin-top:10px">${T('hnorange')}</p>`;
