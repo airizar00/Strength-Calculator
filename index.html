@@ -157,6 +157,7 @@ summary{cursor:pointer;color:var(--mute);font-size:.9rem}
 <div id="hsets"></div>
 <button id="hmore" class="sec" type="button" data-i="hadds"></button>
 <button id="hadd" data-i="hadd"></button>
+<button id="hcancel" class="sec" type="button" hidden data-i="hcancel"></button>
 <p class="note" id="hmsg" aria-live="polite" style="margin-top:10px"></p>
 <div class="prs" id="hbest"></div>
 <div class="seg" id="hrange"><button type="button" class="sec" data-r="14" data-i="r14"></button><button type="button" class="sec" data-r="30" data-i="r30"></button><button type="button" class="sec" data-r="90" data-i="r90"></button><button type="button" class="sec" data-r="365" data-i="r365"></button><button type="button" class="sec" data-r="0" data-i="r0"></button></div>
@@ -193,7 +194,7 @@ const I={
   e6:(p,m)=>`At ${p}% of your 1RM you can usually do about ${m} rep${m===1?'':'s'} per set. Lower the reps or the percentage.`,
   th:'History',hex:'Exercise',hdate:'Date',hadd:'Save session',hmanage:'Manage exercises and backup',hnew:'New exercise',haddex:'Add exercise',hdelex:'Delete selected exercise',hexp:'Export backup',himp:'Import backup',
   hnote:'Saved only in this browser on this device. Export a backup to keep it safe or to move it to another device.',hbest:'Best estimated 1RM:',hchart:'Estimated 1RM over time',hnone:'No entries yet for this exercise.',hnoex:'Add an exercise to start.',
-  he1:'Enter a date and at least one set with a weight above 0 and between 1 and 30 reps.',hdup:'That exercise already exists.',hconf:n=>`Delete "${n}" and all its entries?`,himpok:n=>`Imported ${n} new sessions.`,himperr:'That file is not a valid backup.',hdel:'Delete entry',hsaved:'Session saved.',hwr:'Sets',he1rm:'Est. 1RM',
+  he1:'Enter a date and at least one set with a weight above 0 and between 1 and 30 reps.',hdup:'That exercise already exists.',hconf:n=>`Delete "${n}" and all its entries?`,himpok:n=>`Imported ${n} new sessions.`,himperr:'That file is not a valid backup.',hdel:'Delete entry',hsaved:'Session saved.',hupd:'Update session',hcancel:'Cancel edit',hupdated:'Session updated.',hedt:'Edit session',hedit:d=>`Editing the session from ${d}. Change what you need and update it.`,hconv:u=>`It was recorded in ${u}; values are shown converted to ${S.unit}.`,hgone:'That session no longer exists.',hwr:'Sets',he1rm:'Est. 1RM',
   dn:{squat:'Squat',bench:'Bench press',dead:'Deadlift'},hadds:'+ Add set',hrm:'Remove set',hsetn:'Set',hvol:'Volume',trt:'Rest timer',rtstart:'Start',rtpause:'Pause',rtresume:'Resume',rtreset:'Reset',rtcustom:'Custom time (seconds)',rtsound:'Sound',rtvib:'Vibration',rtdone:'Rest over. Next set!',rtnote:'Where your browser allows it, the screen stays on while counting down. If your phone locks the screen, the alert may not sound or vibrate.',hpr1:'Best estimated 1RM',hpr2:'Heaviest weight lifted (PR)',hpr3:'Most volume in a session',hpr4:'Most volume in a set',
   r14:'2 weeks',r30:'1 month',r90:'3 months',r365:'1 year',r0:'All',hnorange:'No sessions in this period.',
   hprog:'Progression suggestion',hgoal:'Goal',hgw:()=>`Goal weight (${S.unit})`,hs0:'Log a session to get suggestions.',
@@ -221,7 +222,7 @@ const I={
   e6:(p,m)=>`Al ${p}% de tu 1RM normalmente se hacen unas ${m} repeticion${m===1?'':'es'} por serie. Baja las repeticiones o el porcentaje.`,
   th:'Historial',hex:'Ejercicio',hdate:'Fecha',hadd:'Guardar sesión',hmanage:'Gestionar ejercicios y copia de seguridad',hnew:'Nuevo ejercicio',haddex:'Añadir ejercicio',hdelex:'Eliminar el ejercicio seleccionado',hexp:'Exportar copia',himp:'Importar copia',
   hnote:'Se guarda solo en este navegador y en este dispositivo. Exporta una copia para conservarla o para llevarla a otro dispositivo.',hbest:'Mejor 1RM estimado:',hchart:'1RM estimado a lo largo del tiempo',hnone:'Aún no hay registros de este ejercicio.',hnoex:'Añade un ejercicio para empezar.',
-  he1:'Introduce una fecha y al menos una serie con un peso mayor que 0 y entre 1 y 30 repeticiones.',hdup:'Ese ejercicio ya existe.',hconf:n=>`¿Eliminar "${n}" y todos sus registros?`,himpok:n=>`Se han importado ${n} sesiones nuevas.`,himperr:'Ese archivo no es una copia de seguridad válida.',hdel:'Eliminar registro',hsaved:'Sesión guardada.',hwr:'Series',he1rm:'1RM est.',
+  he1:'Introduce una fecha y al menos una serie con un peso mayor que 0 y entre 1 y 30 repeticiones.',hdup:'Ese ejercicio ya existe.',hconf:n=>`¿Eliminar "${n}" y todos sus registros?`,himpok:n=>`Se han importado ${n} sesiones nuevas.`,himperr:'Ese archivo no es una copia de seguridad válida.',hdel:'Eliminar registro',hsaved:'Sesión guardada.',hupd:'Actualizar sesión',hcancel:'Cancelar edición',hupdated:'Sesión actualizada.',hedt:'Editar sesión',hedit:d=>`Editando la sesión del ${d}. Cambia lo que necesites y actualízala.`,hconv:u=>`Se registró en ${u}; los valores se muestran convertidos a ${S.unit}.`,hgone:'Esa sesión ya no existe.',hwr:'Series',he1rm:'1RM est.',
   dn:{squat:'Sentadilla',bench:'Press banca',dead:'Peso muerto'},hadds:'+ Añadir serie',hrm:'Quitar serie',hsetn:'Serie',hvol:'Volumen',trt:'Temporizador de descanso',rtstart:'Iniciar',rtpause:'Pausar',rtresume:'Reanudar',rtreset:'Reiniciar',rtcustom:'Tiempo personalizado (segundos)',rtsound:'Sonido',rtvib:'Vibración',rtdone:'Descanso terminado. ¡Siguiente serie!',rtnote:'Si tu navegador lo permite, la pantalla se mantiene encendida durante la cuenta atrás. Si el móvil bloquea la pantalla, puede que el aviso no suene ni vibre.',hpr1:'Mejor 1RM estimado',hpr2:'Mayor peso levantado (RP)',hpr3:'Mayor volumen en una sesión',hpr4:'Mayor volumen en una serie',
   r14:'2 semanas',r30:'1 mes',r90:'3 meses',r365:'1 año',r0:'Todo',hnorange:'No hay sesiones en este periodo.',
   hprog:'Sugerencia de progresión',hgoal:'Objetivo',hgw:()=>`Peso objetivo (${S.unit})`,hs0:'Registra una sesión para recibir sugerencias.',
@@ -422,7 +423,7 @@ function renderHist(){
   const shown=pts.filter(p=>!H.range||p.t>=Date.now()-H.range*864e5);
   $('hchart').innerHTML=shown.length?chart(shown):`<p class="note" style="margin-top:10px">${T('hnorange')}</p>`;
   $('hl').innerHTML=`<table><tr><th>${T('hdate')}</th><th>${T('hwr')}</th><th>${T('he1rm')}</th><th></th></tr>`+
-   pts.slice().reverse().slice(0,12).map(p=>`<tr><td>${esc(p.d)}</td><td>${p.ss.map(q=>`${fmt(q.w)}×${q.r}`).join(', ')} ${p.u}<br><span class="note">${T('hvol')}: ${fmt(Math.round(p.vol))} ${S.unit}</span></td><td>${fmt(r05(p.v))}${p.v===best?' ★':''}</td><td><button class="sec mini" data-del="${esc(p.id)}" aria-label="${T('hdel')}">✕</button></td></tr>`).join('')+'</table>';
+   pts.slice().reverse().slice(0,12).map(p=>`<tr><td>${esc(p.d)}</td><td>${p.ss.map(q=>`${fmt(q.w)}×${q.r}`).join(', ')} ${p.u}<br><span class="note">${T('hvol')}: ${fmt(Math.round(p.vol))} ${S.unit}</span></td><td>${fmt(r05(p.v))}${p.v===best?' ★':''}</td><td><button class="sec mini" data-edit="${esc(p.id)}" aria-label="${T('hedt')}">✎</button> <button class="sec mini" data-del="${esc(p.id)}" aria-label="${T('hdel')}">✕</button></td></tr>`).join('')+'</table>';
   renderCoach(pts);
 }
 
@@ -440,6 +441,26 @@ function addSetRow(w,r){
   d.innerHTML=`<span class="sn"></span><input class="sw" type="number" inputmode="decimal" min="0" step="0.5" value="${w}"><input class="sr" type="number" inputmode="numeric" min="1" max="30" step="1" value="${r}"><button type="button" class="sec mini rm">✕</button>`;
   $('hsets').appendChild(d);labelRows();
 }
+let editId=null;
+const todayStr=()=>new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+function resetForm(){$('hd').value=todayStr();$('hsets').innerHTML='';addSetRow('','')}
+function editUI(){$('hadd').textContent=T(editId?'hupd':'hadd');$('hcancel').hidden=!editId}
+function cancelEdit(){editId=null;resetForm();editUI();$('hmsg').textContent=''}
+function startEdit(id){
+  const x=H.log.find(l=>l.id===id);
+  if(!x){$('hmsg').textContent=T('hgone');return}
+  editId=id;H.cur=x.ex;saveH();
+  const u=x.u||'kg',same=u===S.unit;
+  $('hd').value=x.date;
+  $('hsets').innerHTML='';
+  setsOf(x).forEach(q=>addSetRow(same?q.w:Math.round(conv(q.w,u)*100)/100,q.r));
+  $('hmsg').textContent=I[S.lang].hedit(x.date)+(same?'':' '+I[S.lang].hconv(u));
+  renderHist();editUI();
+  try{
+    $('hx').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});
+    const f=$('hsets').querySelector('.sw');if(f)f.focus({preventScroll:true});
+  }catch(e){}
+}
 function addEntry(){
   const d=$('hd').value,sets=[];let bad=false;
   $('hsets').querySelectorAll('.srow').forEach(row=>{
@@ -449,9 +470,12 @@ function addEntry(){
     if(!(w>0)||!(r>=1&&r<=30))bad=true;else sets.push({w,r});
   });
   if(!H.cur||!d||bad||!sets.length){$('hmsg').textContent=T('he1');return}
-  H.log.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),ex:H.cur,date:d,u:S.unit,sets});
-  saveH();$('hmsg').textContent=T('hsaved');
-  $('hsets').innerHTML='';addSetRow('','');
+  const x=editId&&H.log.find(l=>l.id===editId);
+  if(x){x.date=d;x.u=S.unit;x.sets=sets;delete x.w;delete x.r}
+  else H.log.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),ex:H.cur,date:d,u:S.unit,sets});
+  const wasEdit=!!x;
+  saveH();editId=null;resetForm();editUI();
+  $('hmsg').textContent=T(wasEdit?'hupdated':'hsaved');
   renderHist();
 }
 function addEx(){
@@ -466,7 +490,7 @@ function delEx(){
   if(delArm===H.cur){
     clearTimeout(delT);delArm=null;
     const n=H.cur;
-    H.ex=H.ex.filter(x=>x!==n);H.log=H.log.filter(x=>x.ex!==n);delete H.goals[n];H.cur=H.ex[0];
+    if(editId)cancelEdit();H.ex=H.ex.filter(x=>x!==n);H.log=H.log.filter(x=>x.ex!==n);delete H.goals[n];H.cur=H.ex[0];
     saveH();b.textContent=T('hdelex');$('hmsg').textContent=I[S.lang].hdeleted(exName(n));renderHist();return;
   }
   delArm=H.cur;b.textContent=I[S.lang].hdelc(exName(H.cur));
@@ -600,6 +624,7 @@ function render(){
   if(shown4)calcSets();
   labelRows();
   renderHist();
+  editUI();
   rtRender();
 }
 
@@ -610,7 +635,7 @@ $('b2').addEventListener('click',calcPlates);
 $('b3').addEventListener('click',calcWarm);
 $('b4').addEventListener('click',calcSets);
 $('pre').addEventListener('change',e=>{const m=e.target.value.match(/(\d+)x(\d+)@(\d+)/);$('ns').value=m[1];$('nr').value=m[2];$('np').value=m[3]});
-$('hx').addEventListener('change',e=>{delArm=null;$('hdx').textContent=T('hdelex');H.cur=e.target.value;saveH();$('hmsg').textContent='';renderHist()});
+$('hx').addEventListener('change',e=>{if(editId)cancelEdit();delArm=null;$('hdx').textContent=T('hdelex');H.cur=e.target.value;saveH();$('hmsg').textContent='';renderHist()});
 $('hrange').addEventListener('click',e=>{const b=e.target.closest('button[data-r]');if(!b)return;H.range=+b.dataset.r;saveH();renderHist()});
 $('hg').addEventListener('change',e=>{const v=parseFloat(e.target.value);if(!H.cur)return;if(v>0)H.goals[H.cur]={w:v,u:S.unit};else delete H.goals[H.cur];saveH();renderHist()});
 $('hadd').addEventListener('click',addEntry);
@@ -621,7 +646,13 @@ $('hdx').addEventListener('click',delEx);
 $('hexp').addEventListener('click',exportH);
 $('himp').addEventListener('click',()=>$('hf').click());
 $('hf').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>importH(String(rd.result));rd.readAsText(f);e.target.value=''});
-$('hl').addEventListener('click',e=>{const b=e.target.closest('button[data-del]');if(!b)return;H.log=H.log.filter(x=>x.id!==b.dataset.del);saveH();renderHist()});
+$('hl').addEventListener('click',e=>{
+  const ed=e.target.closest('button[data-edit]');if(ed){startEdit(ed.dataset.edit);return}
+  const b=e.target.closest('button[data-del]');if(!b)return;
+  if(editId===b.dataset.del)cancelEdit();
+  H.log=H.log.filter(x=>x.id!==b.dataset.del);saveH();renderHist();
+});
+$('hcancel').addEventListener('click',cancelEdit);
 $('rtgo').addEventListener('click',()=>RT.running?rtPause():rtStart());
 $('rtreset').addEventListener('click',rtReset);
 $('rtp').addEventListener('click',e=>{const b=e.target.closest('button[data-s]');if(b)rtSetDur(+b.dataset.s)});
@@ -629,7 +660,7 @@ $('rtc').addEventListener('change',e=>{const v=Math.round(parseFloat(e.target.va
 $('rts1').addEventListener('change',e=>{S.rt.sound=e.target.checked;save();rtBeeps()});
 $('rtv').addEventListener('change',e=>{S.rt.vib=e.target.checked;save()});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&RT.running){rtTick();rtLock()}});
-$('hd').value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+$('hd').value=todayStr();
 addSetRow('','');
 if(S.unit==='lb')$('bw').value=45;
 render();
