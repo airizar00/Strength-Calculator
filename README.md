@@ -4,20 +4,29 @@ A small web tool for lifters: estimate your max, load the bar, warm up, plan set
 
 **Try it:** https://airizar00.github.io/Strength-Calculator/
 
-|Calculators|History and records|On your phone|
-|:-:|:-:|:-:|
-|!\[Calculators](screenshot-1.png)|!\[History and records](screenshot-2.png)|!\[On your phone](screenshot-3.png)|
+<table>
+  <tr>
+    <th align="center" width="33%">Calculators</th>
+    <th align="center" width="33%">History and records</th>
+    <th align="center" width="33%">On your phone</th>
+  </tr>
+  <tr>
+    <td><img src="screenshot-1.png" alt="Calculators"></td>
+    <td><img src="screenshot-2.png" alt="History and records"></td>
+    <td><img src="screenshot-3.png" alt="On your phone"></td>
+  </tr>
+</table>
 
 ## Features
 
-* **1RM estimator**: enter a weight and reps to get your estimated one-rep max and a table of working percentages (average of the Epley and Brzycki formulas).
-* **Plate calculator**: see which plates to load on each side of the bar, using only the plates your gym has.
-* **Warm-up**: a rough warm-up ramp towards your target weight, rounded to the plates you can load.
-* **Sets by percentage**: pick a scheme (e.g. 5 × 5 @ 80%) and get the exact load and plates. Unrealistic combinations are flagged.
-* **History**: log sessions per exercise, with several sets that each have their own weight and reps. Add your own exercises.
-* **Progress**: chart of your estimated 1RM with a period filter, personal records (best estimated 1RM, heaviest weight lifted, most volume in a session and in a set), a next-session suggestion based on your last weeks, and goals with a rough check of how realistic they are.
-* **English / Spanish**, **kg / lb**, light and dark mode.
-* **Installable and offline**: add it to your home screen and it keeps working without a connection after the first visit.
+- **1RM estimator**: enter a weight and reps to get your estimated one-rep max and a table of working percentages (average of the Epley and Brzycki formulas).
+- **Plate calculator**: see which plates to load on each side of the bar, using only the plates your gym has.
+- **Warm-up**: a rough warm-up ramp towards your target weight, rounded to the plates you can load.
+- **Sets by percentage**: pick a scheme (e.g. 5 × 5 @ 80%) and get the exact load and plates. Unrealistic combinations are flagged.
+- **History**: log sessions per exercise, with several sets that each have their own weight and reps. Add your own exercises.
+- **Progress**: chart of your estimated 1RM with a period filter, personal records (best estimated 1RM, heaviest weight lifted, most volume in a session and in a set), a next-session suggestion based on your last weeks, and goals with a rough check of how realistic they are.
+- **English / Spanish**, **kg / lb**, light and dark mode.
+- **Installable and offline**: add it to your home screen and it keeps working without a connection after the first visit.
 
 ## Your data
 
@@ -29,10 +38,9 @@ Open `index.html` in your browser. The offline mode needs the hosted (https) ver
 
 ## Notes
 
-* 1RM values are estimates and are most accurate for sets of 12 reps or fewer.
-* Warm-ups, suggestions and goal checks are general guides, not personalised training or medical advice.
+- 1RM values are estimates and are most accurate for sets of 12 reps or fewer.
+- Warm-ups, suggestions and goal checks are general guides, not personalised training or medical advice.
 
 ## License
 
 See the [LICENSE](LICENSE) file.
-
