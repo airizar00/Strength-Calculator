@@ -72,6 +72,14 @@ button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
 summary{cursor:pointer;color:var(--mute);font-size:.9rem}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .chips label{flex:none;display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;color:var(--ink)}
+[hidden]{display:none!important}
+.rtd{font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-weight:700;font-size:4.5rem;line-height:1;text-align:center;padding:18px 0;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-variant-numeric:tabular-nums}
+.rtd.done{background:var(--accent);color:var(--onaccent);border-color:var(--accent)}
+@media(prefers-reduced-motion:no-preference){.rtd.done{animation:rtpulse 1s ease-in-out 3}}
+@keyframes rtpulse{50%{opacity:.55}}
+.rtb{display:flex;gap:12px}
+.rtb button{flex:1}
+@media(min-width:820px){.rtd{font-size:5.5rem}}
 </style>
 </head>
 <body>
@@ -128,6 +136,17 @@ summary{cursor:pointer;color:var(--mute);font-size:.9rem}
 <div id="o4" aria-live="polite"></div>
 </section>
 
+<section class="wide" aria-labelledby="t6">
+<h2 id="t6" data-i="trt"></h2>
+<div id="rtd" class="rtd" role="timer" aria-live="off">2:00</div>
+<div class="seg" id="rtp"><button type="button" class="sec" data-s="60">1:00</button><button type="button" class="sec" data-s="90">1:30</button><button type="button" class="sec" data-s="120">2:00</button><button type="button" class="sec" data-s="180">3:00</button><button type="button" class="sec" data-s="300">5:00</button></div>
+<label style="margin-top:12px"><span data-i="rtcustom"></span><input id="rtc" type="number" inputmode="numeric" min="5" max="3600" step="5"></label>
+<div class="rtb"><button id="rtgo" type="button"></button><button id="rtreset" class="sec" type="button" data-i="rtreset"></button></div>
+<div class="chips"><label><input type="checkbox" id="rts1"> <span data-i="rtsound"></span></label><label id="rtvl"><input type="checkbox" id="rtv"> <span data-i="rtvib"></span></label></div>
+<p class="note" id="rtmsg" aria-live="polite" style="margin-top:10px"></p>
+<p class="note" style="margin-top:10px" data-i="rtnote"></p>
+</section>
+
 <section class="wide" aria-labelledby="t5">
 <h2 id="t5" data-i="th"></h2>
 <div class="row">
@@ -175,7 +194,7 @@ const I={
   th:'History',hex:'Exercise',hdate:'Date',hadd:'Save session',hmanage:'Manage exercises and backup',hnew:'New exercise',haddex:'Add exercise',hdelex:'Delete selected exercise',hexp:'Export backup',himp:'Import backup',
   hnote:'Saved only in this browser on this device. Export a backup to keep it safe or to move it to another device.',hbest:'Best estimated 1RM:',hchart:'Estimated 1RM over time',hnone:'No entries yet for this exercise.',hnoex:'Add an exercise to start.',
   he1:'Enter a date and at least one set with a weight above 0 and between 1 and 30 reps.',hdup:'That exercise already exists.',hconf:n=>`Delete "${n}" and all its entries?`,himpok:n=>`Imported ${n} new sessions.`,himperr:'That file is not a valid backup.',hdel:'Delete entry',hsaved:'Session saved.',hwr:'Sets',he1rm:'Est. 1RM',
-  dn:{squat:'Squat',bench:'Bench press',dead:'Deadlift'},hadds:'+ Add set',hrm:'Remove set',hsetn:'Set',hvol:'Volume',hpr1:'Best estimated 1RM',hpr2:'Heaviest weight lifted (PR)',hpr3:'Most volume in a session',hpr4:'Most volume in a set',
+  dn:{squat:'Squat',bench:'Bench press',dead:'Deadlift'},hadds:'+ Add set',hrm:'Remove set',hsetn:'Set',hvol:'Volume',trt:'Rest timer',rtstart:'Start',rtpause:'Pause',rtresume:'Resume',rtreset:'Reset',rtcustom:'Custom time (seconds)',rtsound:'Sound',rtvib:'Vibration',rtdone:'Rest over. Next set!',rtnote:'Where your browser allows it, the screen stays on while counting down. If your phone locks the screen, the alert may not sound or vibrate.',hpr1:'Best estimated 1RM',hpr2:'Heaviest weight lifted (PR)',hpr3:'Most volume in a session',hpr4:'Most volume in a set',
   r14:'2 weeks',r30:'1 month',r90:'3 months',r365:'1 year',r0:'All',hnorange:'No sessions in this period.',
   hprog:'Progression suggestion',hgoal:'Goal',hgw:()=>`Goal weight (${S.unit})`,hs0:'Log a session to get suggestions.',
   hsbase:(e,w)=>`Reference: estimated 1RM ${e} ${S.unit} (${w}).`,hwk:'last 4 weeks',hlast:'latest session',
@@ -203,7 +222,7 @@ const I={
   th:'Historial',hex:'Ejercicio',hdate:'Fecha',hadd:'Guardar sesión',hmanage:'Gestionar ejercicios y copia de seguridad',hnew:'Nuevo ejercicio',haddex:'Añadir ejercicio',hdelex:'Eliminar el ejercicio seleccionado',hexp:'Exportar copia',himp:'Importar copia',
   hnote:'Se guarda solo en este navegador y en este dispositivo. Exporta una copia para conservarla o para llevarla a otro dispositivo.',hbest:'Mejor 1RM estimado:',hchart:'1RM estimado a lo largo del tiempo',hnone:'Aún no hay registros de este ejercicio.',hnoex:'Añade un ejercicio para empezar.',
   he1:'Introduce una fecha y al menos una serie con un peso mayor que 0 y entre 1 y 30 repeticiones.',hdup:'Ese ejercicio ya existe.',hconf:n=>`¿Eliminar "${n}" y todos sus registros?`,himpok:n=>`Se han importado ${n} sesiones nuevas.`,himperr:'Ese archivo no es una copia de seguridad válida.',hdel:'Eliminar registro',hsaved:'Sesión guardada.',hwr:'Series',he1rm:'1RM est.',
-  dn:{squat:'Sentadilla',bench:'Press banca',dead:'Peso muerto'},hadds:'+ Añadir serie',hrm:'Quitar serie',hsetn:'Serie',hvol:'Volumen',hpr1:'Mejor 1RM estimado',hpr2:'Mayor peso levantado (RP)',hpr3:'Mayor volumen en una sesión',hpr4:'Mayor volumen en una serie',
+  dn:{squat:'Sentadilla',bench:'Press banca',dead:'Peso muerto'},hadds:'+ Añadir serie',hrm:'Quitar serie',hsetn:'Serie',hvol:'Volumen',trt:'Temporizador de descanso',rtstart:'Iniciar',rtpause:'Pausar',rtresume:'Reanudar',rtreset:'Reiniciar',rtcustom:'Tiempo personalizado (segundos)',rtsound:'Sonido',rtvib:'Vibración',rtdone:'Descanso terminado. ¡Siguiente serie!',rtnote:'Si tu navegador lo permite, la pantalla se mantiene encendida durante la cuenta atrás. Si el móvil bloquea la pantalla, puede que el aviso no suene ni vibre.',hpr1:'Mejor 1RM estimado',hpr2:'Mayor peso levantado (RP)',hpr3:'Mayor volumen en una sesión',hpr4:'Mayor volumen en una serie',
   r14:'2 semanas',r30:'1 mes',r90:'3 meses',r365:'1 año',r0:'Todo',hnorange:'No hay sesiones en este periodo.',
   hprog:'Sugerencia de progresión',hgoal:'Objetivo',hgw:()=>`Peso objetivo (${S.unit})`,hs0:'Registra una sesión para recibir sugerencias.',
   hsbase:(e,w)=>`Referencia: 1RM estimado de ${e} ${S.unit} (${w}).`,hwk:'últimas 4 semanas',hlast:'última sesión',
@@ -483,6 +502,88 @@ function chips(){
   }));
 }
 
+// ---------- Rest timer ----------
+const RT={left:0,endAt:0,running:false,done:false,iv:null,ctx:null,nodes:[],wl:null};
+S.rt=Object.assign({dur:120,sound:true,vib:true},S.rt||{});
+if(!(S.rt.dur>=5&&S.rt.dur<=3600))S.rt.dur=120;
+RT.left=S.rt.dur*1000;
+const mmss=ms=>{const t=Math.max(0,Math.ceil(ms/1000));return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
+
+function rtCancelAudio(){RT.nodes.forEach(o=>{try{o.stop()}catch(e){}try{o.disconnect()}catch(e){}});RT.nodes=[]}
+// The 3 beeps are scheduled on the audio clock for the moment the countdown ends
+function rtBeeps(){
+  rtCancelAudio();
+  if(!S.rt.sound||!RT.running)return;
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+    RT.ctx=RT.ctx||new AC();
+    if(RT.ctx.state==='suspended')RT.ctx.resume();
+    const t0=RT.ctx.currentTime+Math.max(0,RT.endAt-Date.now())/1000;
+    for(let i=0;i<3;i++){
+      const o=RT.ctx.createOscillator(),g=RT.ctx.createGain(),st=t0+i*.32;
+      o.type='sine';o.frequency.value=i===2?1175:880;
+      g.gain.setValueAtTime(0.0001,st);g.gain.exponentialRampToValueAtTime(.4,st+.02);g.gain.exponentialRampToValueAtTime(.0001,st+.22);
+      o.connect(g);g.connect(RT.ctx.destination);o.start(st);o.stop(st+.25);
+      RT.nodes.push(o);
+    }
+  }catch(e){}
+}
+async function rtLock(){
+  try{
+    if('wakeLock' in navigator&&!RT.wl){
+      RT.wl=await navigator.wakeLock.request('screen');
+      RT.wl.addEventListener('release',()=>{RT.wl=null});
+      if(!RT.running)rtUnlock();
+    }
+  }catch(e){}
+}
+function rtUnlock(){try{if(RT.wl)RT.wl.release()}catch(e){}RT.wl=null}
+
+function rtRender(){
+  const d=$('rtd'),go=$('rtgo');
+  d.textContent=mmss(RT.left);d.classList.toggle('done',RT.done);
+  go.textContent=T(RT.running?'rtpause':(!RT.done&&RT.left>0&&RT.left<S.rt.dur*1000)?'rtresume':'rtstart');
+  document.querySelectorAll('#rtp button').forEach(b=>b.classList.toggle('on',+b.dataset.s===S.rt.dur));
+  $('rts1').checked=!!S.rt.sound;$('rtv').checked=!!S.rt.vib;
+  $('rtvl').hidden=!navigator.vibrate;
+  const msg=RT.done?T('rtdone'):'';
+  if($('rtmsg').textContent!==msg)$('rtmsg').textContent=msg;
+  if(document.activeElement!==$('rtc'))$('rtc').value=[60,90,120,180,300].includes(S.rt.dur)?'':S.rt.dur;
+  document.title=RT.running?`${mmss(RT.left)} · ${T('title')}`:RT.done?`⏱ ${T('rtdone')}`:T('title');
+}
+function rtFinish(){
+  RT.running=false;RT.done=true;RT.left=0;clearInterval(RT.iv);rtUnlock();
+  if(S.rt.vib&&navigator.vibrate){try{navigator.vibrate([300,150,300,150,500])}catch(e){}}
+  rtRender();
+}
+function rtTick(){
+  if(!RT.running)return;
+  RT.left=RT.endAt-Date.now();
+  if(RT.left<=0)rtFinish();else rtRender();
+}
+function rtStart(){
+  if(RT.running)return;
+  if(RT.done||RT.left<=0){RT.left=S.rt.dur*1000;RT.done=false}
+  RT.endAt=Date.now()+RT.left;RT.running=true;
+  clearInterval(RT.iv);RT.iv=setInterval(rtTick,250);
+  rtLock();rtBeeps();rtRender();
+}
+function rtPause(){
+  if(!RT.running)return;
+  RT.left=Math.max(0,RT.endAt-Date.now());RT.running=false;
+  clearInterval(RT.iv);rtCancelAudio();rtUnlock();rtRender();
+}
+function rtReset(){
+  RT.running=false;RT.done=false;RT.left=S.rt.dur*1000;
+  clearInterval(RT.iv);rtCancelAudio();rtUnlock();rtRender();
+}
+function rtSetDur(sec){
+  S.rt.dur=sec;save();
+  if(RT.running){RT.endAt=Date.now()+sec*1000;RT.left=sec*1000;rtBeeps()}
+  else{RT.left=sec*1000;RT.done=false}
+  rtRender();
+}
+
 function render(){
   delArm=null;
   document.documentElement.lang=S.lang;
@@ -499,6 +600,7 @@ function render(){
   if(shown4)calcSets();
   labelRows();
   renderHist();
+  rtRender();
 }
 
 $('flag').addEventListener('click',()=>{S.lang=S.lang==='en'?'es':'en';save();render()});
@@ -520,6 +622,13 @@ $('hexp').addEventListener('click',exportH);
 $('himp').addEventListener('click',()=>$('hf').click());
 $('hf').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>importH(String(rd.result));rd.readAsText(f);e.target.value=''});
 $('hl').addEventListener('click',e=>{const b=e.target.closest('button[data-del]');if(!b)return;H.log=H.log.filter(x=>x.id!==b.dataset.del);saveH();renderHist()});
+$('rtgo').addEventListener('click',()=>RT.running?rtPause():rtStart());
+$('rtreset').addEventListener('click',rtReset);
+$('rtp').addEventListener('click',e=>{const b=e.target.closest('button[data-s]');if(b)rtSetDur(+b.dataset.s)});
+$('rtc').addEventListener('change',e=>{const v=Math.round(parseFloat(e.target.value));if(v>=5&&v<=3600)rtSetDur(v);else rtRender()});
+$('rts1').addEventListener('change',e=>{S.rt.sound=e.target.checked;save();rtBeeps()});
+$('rtv').addEventListener('change',e=>{S.rt.vib=e.target.checked;save()});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&RT.running){rtTick();rtLock()}});
 $('hd').value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
 addSetRow('','');
 if(S.unit==='lb')$('bw').value=45;
