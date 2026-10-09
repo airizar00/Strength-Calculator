@@ -23,7 +23,7 @@ A small web tool for lifters: estimate your max, load the bar, warm up, plan set
 - **Warm-up**: a rough warm-up ramp towards your target weight, rounded to the plates you can load.
 - **Sets by percentage**: pick a scheme (e.g. 5 × 5 @ 80%) and get the exact load and plates. Unrealistic combinations are flagged.
 - **History**: log, edit and delete sessions per exercise, with several sets that each have their own weight and reps. Add your own exercises.
-- **Progress**: chart of your estimated 1RM with a period filter, personal records (best estimated 1RM, heaviest weight lifted, most volume in a session and in a set), a next-session suggestion based on your last weeks, and goals with a rough check of how realistic they are.
+- **Progress**: chart of your estimated 1RM with a period filter, personal records (best estimated 1RM, heaviest weight lifted, most volume in a session and in a set), rep records (best weight for 1, 3, 5 and 10 reps), a next-session suggestion based on your last weeks, and goals with a rough check of how realistic they are.
 - **Rest timer**: countdown with quick presets (1:00 to 5:00) or a custom time, with sound and vibration when it ends.
 - **English / Spanish**, **kg / lb**, light and dark mode.
 - **Installable and offline**: add it to your home screen and it keeps working without a connection after the first visit.
